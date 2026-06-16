@@ -76,7 +76,7 @@ def load_settings(env: dict[str, str] | None = None) -> Settings:
         oidc_token_endpoint=token_ep,
         mcp_required_group=e.get("MCP_REQUIRED_GROUP", "").strip(),
         public_base_url=e.get("PUBLIC_BASE_URL", "").strip(),
-        brand_orange=e.get("BRAND_ORANGE", "#f5a623").strip(),
-        brand_blue=e.get("BRAND_BLUE", "#1e6fd9").strip(),
-        bg=e.get("BG", "#fbfbfd").strip(),
+        brand_orange=e.get("BRAND_ORANGE", "#FF5F2C").strip(),
+        brand_blue=e.get("BRAND_BLUE", "#2C53AB").strip(),
+        bg=e.get("BG", "#FFFFFF").strip(),
     )

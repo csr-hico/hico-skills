@@ -1,13 +1,13 @@
 /* Brand colors are CSS custom properties so they are swappable without touching markup.
    Defaults here; render.py injects an env-driven :root override after this file loads. */
 :root {
-  --brand-orange: #f5a623;
-  --brand-blue: #1e6fd9;
-  --bg: #fbfbfd;
-  --fg: #1a1a1a;
-  --muted: #6b7280;
-  --card: #ffffff;
-  --border: #e6e8eb;
+  --brand-orange: #FF5F2C;
+  --brand-blue: #2C53AB;
+  --bg: #FFFFFF;        /* Crisp White - guideline: backgrounds */
+  --fg: #030000;        /* Midnight - guideline: primary text */
+  --muted: #5A4F4D;     /* Earthy Clay - neutral, AA-safe secondary text */
+  --card: #FFFFFF;      /* Crisp White */
+  --border: #E1DFDF;    /* Light Mist - subtlest neutral */
   --accent: var(--brand-orange);
   --radius: 10px;
 }
@@ -80,7 +80,7 @@ h2 { font-size: 1.25rem; border-left: 4px solid var(--accent); padding-left: 0.6
   font-size: 1.05rem;
   font-weight: 700;
   color: var(--fg);
-  background: #fff3df;
+  background: #FFE0DB;  /* Sheen - brand light-orange tint */
   border: 1px solid var(--brand-orange);
   padding: 0.3rem 0.55rem;
 }
@@ -111,7 +111,7 @@ code {
   border-radius: var(--radius);
   outline: none;
 }
-#q:focus { border-color: var(--brand-blue); box-shadow: 0 0 0 3px rgba(30, 111, 217, 0.15); }
+#q:focus { border-color: var(--brand-blue); box-shadow: 0 0 0 3px rgba(44, 83, 171, 0.18); }
 .count { color: var(--muted); font-size: 0.82rem; margin: 0.5rem 0; }
 
 .rows { display: flex; flex-direction: column; gap: 0.5rem; }
