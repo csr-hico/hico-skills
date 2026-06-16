@@ -34,3 +34,4 @@ class SearchHit:
 class Identity:
     username: str | None = None
     groups: tuple[str, ...] = field(default_factory=tuple)
+    name: str | None = None
