@@ -8,12 +8,22 @@
 
   let all = [];
 
+  // First letter of first + last word (or first 2 letters of a single word).
+  function initials(s) {
+    const w = String(s).trim().split(/\s+/).filter(Boolean);
+    if (!w.length) return "";
+    if (w.length === 1) return w[0].slice(0, 2);
+    return w[0][0] + w[w.length - 1][0];
+  }
+
   async function loadBadge() {
     try {
       const me = await (await fetch("/api/me")).json();
-      if (me && me.username) {
+      const label = (me && (me.name || me.username)) || "";
+      if (label) {
         const b = $("badge");
-        b.textContent = me.username;
+        b.textContent = initials(label);
+        b.title = label;
         b.hidden = false;
       }
     } catch (_) {

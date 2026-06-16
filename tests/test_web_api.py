@@ -30,13 +30,24 @@ def test_api_skills_shape_includes_description(client):
 def test_api_me_reads_forward_auth_headers(client):
     r = client.get(
         "/api/me",
-        headers={"X-authentik-username": "jdoe", "X-authentik-groups": "HICO,dev"},
+        headers={
+            "X-authentik-username": "jdoe",
+            "X-authentik-name": "Jane Doe",
+            "X-authentik-groups": "HICO,dev",
+        },
     )
-    assert r.json() == {"username": "jdoe", "groups": ["HICO", "dev"]}
+    assert r.json() == {"username": "jdoe", "name": "Jane Doe", "groups": ["HICO", "dev"]}
 
 
 def test_api_me_anonymous(client):
-    assert client.get("/api/me").json() == {"username": None, "groups": []}
+    assert client.get("/api/me").json() == {"username": None, "name": None, "groups": []}
+
+
+def test_static_logo_served(client):
+    r = client.get("/static/hico-logo.png")
+    assert r.status_code == 200
+    assert r.headers["content-type"] == "image/png"
+    assert r.content[:8] == b"\x89PNG\r\n\x1a\n"
 
 
 def test_index_injects_brand_color(client):

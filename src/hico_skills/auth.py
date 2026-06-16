@@ -12,6 +12,7 @@ from .models import Identity
 
 _USER_HEADER = "x-authentik-username"
 _GROUPS_HEADER = "x-authentik-groups"
+_NAME_HEADER = "x-authentik-name"  # Entra display name ("Vorname Nachname"), for avatar initials
 
 
 def _get_ci(headers: Mapping[str, str], key: str) -> str | None:
@@ -24,9 +25,10 @@ def _get_ci(headers: Mapping[str, str], key: str) -> str | None:
 def identity_from_headers(headers: Mapping[str, str]) -> Identity:
     """Build an Identity from forward-auth headers. Absent headers -> anonymous."""
     username = _get_ci(headers, _USER_HEADER)
+    name = _get_ci(headers, _NAME_HEADER)
     raw_groups = _get_ci(headers, _GROUPS_HEADER)
     groups = tuple(g.strip() for g in raw_groups.split(",") if g.strip()) if raw_groups else ()
-    return Identity(username=(username or None), groups=groups)
+    return Identity(username=(username or None), name=(name or None), groups=groups)
 
 
 def is_allowed(identity: Identity, required_group: str | None) -> bool:
