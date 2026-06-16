@@ -1,0 +1,23 @@
+name: mirror-to-gitlab
+
+# GitHub is the source of truth. On every push to main (i.e. after a PR merge), fast-forward
+# the GitLab mirror, which is where the homelab automation (webhook-proxy -> Coolify) hooks in.
+# No --force: a normal merge advances main linearly, so the mirror fast-forwards. A history
+# rewrite would fail loudly here on purpose (handle it deliberately, don't force silently).
+on:
+  push:
+    branches: [main]
+
+jobs:
+  mirror:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Push main to GitLab mirror
+        env:
+          GITLAB_TOKEN: ${{ secrets.GITLAB_MIRROR_TOKEN }}
+        run: |
+          git push "https://oauth2:${GITLAB_TOKEN}@gitlab.com/chrislybear/hico-skills.git" \
+            "HEAD:refs/heads/main"
