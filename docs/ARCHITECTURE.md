@@ -38,3 +38,13 @@ picked up without a restart.
 
 No server-side agent execution (`run_agent`), no vector search, no database, no static-token auth.
 See the project plan for the deferred roadmap.
+
+## Deployment pipeline
+
+GitHub is the source of truth; the homelab automation runs off a GitLab mirror.
+
+1. PR merged to `main` on GitHub (branch protection + the `test` check gate every change).
+2. A GitHub Action (`mirror-to-gitlab`) fast-forwards the GitLab mirror.
+3. The GitLab push fires one webhook to the **webhook-proxy** (never a direct GitLab->Coolify hook).
+4. The webhook-proxy syncs the SOPS-encrypted env to Coolify and forwards the push to Coolify,
+   which rebuilds and redeploys the app. Traefik issues/renews the cert via httpChallenge.
