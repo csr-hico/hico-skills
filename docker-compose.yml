@@ -1,0 +1,47 @@
+# Coolify Raw-Compose. Host comes from ${APP_DOMAIN} (a Coolify env var) so the shared repo
+# never names the hosting. Two routers on one service:
+#   - /mcp + /.well-known : OIDC resource-server, NO forward-auth middleware (it returns its own
+#                           401 + WWW-Authenticate so MCP clients can run the OAuth flow).
+#   - everything else     : the web OnePager behind Authentik forward-auth (authentik@file).
+services:
+  hico-skills:
+    build: .
+    container_name: hico-skills
+    restart: unless-stopped
+    networks:
+      - default
+      - web
+    env_file:
+      - .env
+    healthcheck:
+      test: ["CMD-SHELL", "python -c \"import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/healthz', timeout=3)\""]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 30s
+    labels:
+      - "coolify.managed=true"
+      - "coolify.applicationId=${COOLIFY_APP_ID}"
+      - "coolify.type=application"
+      - "coolify.name=hico-skills"
+      - "traefik.enable=true"
+      - "traefik.docker.network=web"
+      - "traefik.http.services.hico-skills.loadbalancer.server.port=8000"
+      # Router 1: /mcp + /.well-known, NO auth middleware, higher priority
+      - "traefik.http.routers.hico-skills-mcp.entrypoints=websecure"
+      - "traefik.http.routers.hico-skills-mcp.rule=Host(`${APP_DOMAIN}`) && (PathPrefix(`/mcp`) || PathPrefix(`/.well-known`))"
+      - "traefik.http.routers.hico-skills-mcp.priority=100"
+      - "traefik.http.routers.hico-skills-mcp.service=hico-skills"
+      - "traefik.http.routers.hico-skills-mcp.tls.certResolver=leresolver"
+      # Router 2: catch-all web UI, forward-auth, lower priority
+      - "traefik.http.routers.hico-skills-web.entrypoints=websecure"
+      - "traefik.http.routers.hico-skills-web.rule=Host(`${APP_DOMAIN}`)"
+      - "traefik.http.routers.hico-skills-web.priority=1"
+      - "traefik.http.routers.hico-skills-web.service=hico-skills"
+      - "traefik.http.routers.hico-skills-web.tls.certResolver=leresolver"
+      - "traefik.http.routers.hico-skills-web.middlewares=authentik@file"
+
+networks:
+  default: {}
+  web:
+    external: true

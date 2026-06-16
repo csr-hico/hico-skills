@@ -1,0 +1,124 @@
+/* Brand colors are CSS custom properties so they are swappable without touching markup.
+   Defaults here; render.py injects an env-driven :root override after this file loads. */
+:root {
+  --brand-orange: #f5a623;
+  --brand-blue: #1e6fd9;
+  --bg: #fbfbfd;
+  --fg: #1a1a1a;
+  --muted: #6b7280;
+  --card: #ffffff;
+  --border: #e6e8eb;
+  --accent: var(--brand-orange);
+  --radius: 10px;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  background: var(--bg);
+  color: var(--fg);
+  line-height: 1.5;
+}
+
+.topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.9rem 1.5rem;
+  background: var(--card);
+  border-bottom: 3px solid var(--brand-blue);
+}
+.brand { display: flex; align-items: center; gap: 0.55rem; font-weight: 600; font-size: 1.1rem; }
+.logo {
+  background: var(--brand-orange);
+  color: #fff;
+  padding: 0.15rem 0.5rem;
+  border-radius: 6px;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+}
+.badge {
+  background: var(--brand-blue);
+  color: #fff;
+  padding: 0.3rem 0.75rem;
+  border-radius: 999px;
+  font-size: 0.85rem;
+  font-weight: 500;
+}
+
+main { max-width: 880px; margin: 0 auto; padding: 1.5rem; }
+section { margin-bottom: 2.5rem; }
+h1 { font-size: 1.8rem; margin: 0.5rem 0; }
+h2 { font-size: 1.25rem; border-left: 4px solid var(--accent); padding-left: 0.6rem; }
+.intro p { color: var(--muted); max-width: 60ch; }
+
+.connect-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 0.75rem; }
+.connect details {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 0.5rem 0.9rem;
+}
+.connect summary { cursor: pointer; font-weight: 600; }
+.connect ul { margin: 0.6rem 0 0.2rem; padding-left: 1.1rem; font-size: 0.9rem; }
+.connect li { margin-bottom: 0.4rem; }
+.hint { color: var(--muted); font-size: 0.82rem; margin-top: 0.9rem; }
+code {
+  background: #f0f2f5;
+  padding: 0.1rem 0.35rem;
+  border-radius: 5px;
+  font-size: 0.85em;
+  word-break: break-all;
+}
+
+#q {
+  width: 100%;
+  padding: 0.7rem 0.9rem;
+  font-size: 1rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  outline: none;
+}
+#q:focus { border-color: var(--brand-blue); box-shadow: 0 0 0 3px rgba(30, 111, 217, 0.15); }
+.count { color: var(--muted); font-size: 0.82rem; margin: 0.5rem 0; }
+
+.rows { display: flex; flex-direction: column; gap: 0.5rem; }
+.row {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 0.65rem 0.95rem;
+}
+.row > summary {
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  list-style: none;
+}
+.row > summary::-webkit-details-marker { display: none; }
+.row[open] { border-color: var(--brand-orange); }
+.tag {
+  font-size: 0.68rem;
+  text-transform: uppercase;
+  font-weight: 700;
+  padding: 0.12rem 0.45rem;
+  border-radius: 5px;
+  color: #fff;
+}
+.tag.skill { background: var(--brand-blue); }
+.tag.agent { background: var(--brand-orange); }
+.row .name { font-weight: 600; }
+.row .wtu { color: var(--muted); font-size: 0.82rem; margin-left: auto; }
+.row .desc { margin: 0.7rem 0 0.2rem; white-space: pre-wrap; }
+.empty { color: var(--muted); }
+
+footer {
+  text-align: center;
+  color: var(--muted);
+  font-size: 0.8rem;
+  padding: 1.5rem;
+  border-top: 1px solid var(--border);
+}

@@ -1,0 +1,6 @@
+# SOPS rule: encrypt secrets.enc.yaml to the shared infra age recipient (a PUBLIC key, safe to
+# commit). Swap in a project-specific age key if you want this repo fully decoupled from the
+# homelab key. Encrypt with:  sops -e -i secrets.enc.yaml
+creation_rules:
+  - path_regex: secrets\.enc\.yaml$
+    age: age1nffhtypyujcza8hsk8thwya8d6f7dkpu3ve5j2hyt4w65t4d4vaqefa5ph

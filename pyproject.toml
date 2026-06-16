@@ -1,0 +1,31 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "hico-skills"
+version = "0.1.0"
+description = "Skill/agent library served as an OIDC-gated remote MCP server with a browse OnePager."
+requires-python = ">=3.11"
+dependencies = [
+    "fastmcp>=3,<4",   # MCP server + bundled Starlette/uvicorn (the whole point)
+    "PyYAML>=6",       # YAML frontmatter parsing; hand-rolling YAML is the trap to avoid
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8",       # test runner; nothing merges red
+    "httpx>=0.27",     # in-process ASGI tests, no live port
+    "ruff>=0.5",       # lint + format in one tool
+]
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["src"]
+
+[tool.ruff]
+line-length = 100
+src = ["src", "tests"]

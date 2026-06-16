@@ -1,0 +1,13 @@
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+*.egg-info/
+.pytest_cache/
+.ruff_cache/
+
+# Decrypted runtime env (never commit). The encrypted secrets.enc.yaml IS committed.
+.env
+
+# Local worktrees
+.worktrees/
