@@ -24,6 +24,9 @@ class Settings:
     oidc_jwks_uri: str
     oidc_audience: str
     oidc_client_id: str
+    oidc_client_secret: str  # empty -> public client (PKCE)
+    oidc_authorize_endpoint: str
+    oidc_token_endpoint: str
     mcp_required_group: str
     public_base_url: str
     # Generic, non-revealing:
@@ -49,6 +52,16 @@ def load_settings(env: dict[str, str] | None = None) -> Settings:
     if issuer and not jwks:
         jwks = issuer.rstrip("/") + "/jwks/"
 
+    # Authentik's authorize/token endpoints are global (not per-app); derive them from the
+    # issuer host so nothing is hardcoded. Overridable via env if the IdP differs.
+    idp_base = issuer.split("/application/o/")[0] if "/application/o/" in issuer else ""
+    authorize = e.get("OIDC_AUTHORIZE_ENDPOINT", "").strip() or (
+        f"{idp_base}/application/o/authorize/" if idp_base else ""
+    )
+    token_ep = e.get("OIDC_TOKEN_ENDPOINT", "").strip() or (
+        f"{idp_base}/application/o/token/" if idp_base else ""
+    )
+
     return Settings(
         skills_dir=Path(e.get("SKILLS_DIR", str(_REPO_ROOT / "skills"))),
         frontend_dir=Path(e.get("FRONTEND_DIR", str(_REPO_ROOT / "frontend"))),
@@ -58,6 +71,9 @@ def load_settings(env: dict[str, str] | None = None) -> Settings:
         oidc_jwks_uri=jwks,
         oidc_audience=e.get("OIDC_AUDIENCE", "").strip(),
         oidc_client_id=e.get("OIDC_CLIENT_ID", "").strip(),
+        oidc_client_secret=e.get("OIDC_CLIENT_SECRET", "").strip(),
+        oidc_authorize_endpoint=authorize,
+        oidc_token_endpoint=token_ep,
         mcp_required_group=e.get("MCP_REQUIRED_GROUP", "").strip(),
         public_base_url=e.get("PUBLIC_BASE_URL", "").strip(),
         brand_orange=e.get("BRAND_ORANGE", "#f5a623").strip(),

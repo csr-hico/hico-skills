@@ -29,7 +29,7 @@ services:
       - "traefik.http.services.hico-skills.loadbalancer.server.port=8000"
       # Router 1: /mcp + /.well-known, NO auth middleware, higher priority
       - "traefik.http.routers.hico-skills-mcp.entrypoints=websecure"
-      - "traefik.http.routers.hico-skills-mcp.rule=Host(`${APP_DOMAIN}`) && (PathPrefix(`/mcp`) || PathPrefix(`/.well-known`))"
+      - "traefik.http.routers.hico-skills-mcp.rule=Host(`${APP_DOMAIN}`) && (PathPrefix(`/mcp`) || PathPrefix(`/.well-known`) || PathPrefix(`/authorize`) || PathPrefix(`/token`) || PathPrefix(`/register`) || PathPrefix(`/auth`) || PathPrefix(`/consent`))"
       - "traefik.http.routers.hico-skills-mcp.priority=100"
       - "traefik.http.routers.hico-skills-mcp.service=hico-skills"
       - "traefik.http.routers.hico-skills-mcp.tls.certResolver=leresolver"

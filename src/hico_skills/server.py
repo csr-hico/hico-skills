@@ -11,7 +11,7 @@ from __future__ import annotations
 
 from fastmcp import FastMCP
 from fastmcp.exceptions import ToolError
-from fastmcp.server.auth import AuthContext, AuthCheck, RemoteAuthProvider
+from fastmcp.server.auth import AuthCheck, AuthContext, OAuthProxy
 from fastmcp.server.auth.providers.jwt import JWTVerifier
 
 from .config import Settings
@@ -34,21 +34,32 @@ def require_group(group: str) -> AuthCheck:
     return check
 
 
-def build_auth(settings: Settings) -> RemoteAuthProvider | None:
-    """OIDC resource-server provider, or None when auth is disabled (local dev/tests)."""
-    if not settings.auth_enabled:
+def build_auth(settings: Settings) -> OAuthProxy | None:
+    """DCR/CIMD-capable OAuth proxy in front of Authentik, or None when auth is disabled.
+
+    Authentik has no dynamic client registration endpoint, so MCP clients (OpenAI, Claude,
+    Gemini) cannot self-register against it. OAuthProxy presents a DCR + CIMD interface to those
+    clients while using a SINGLE pre-registered Authentik client with one fixed redirect URI
+    (`/auth/callback`). The upstream Authentik access token is validated by the JWTVerifier, so the
+    `groups` claim still flows through and the per-tool HICO check keeps working.
+    """
+    if not (settings.oidc_issuer and settings.oidc_client_id):
         return None
     verifier = JWTVerifier(
         jwks_uri=settings.oidc_jwks_uri,
         issuer=settings.oidc_issuer,
         audience=settings.oidc_audience or None,
     )
-    return RemoteAuthProvider(
+    return OAuthProxy(
+        upstream_authorization_endpoint=settings.oidc_authorize_endpoint,
+        upstream_token_endpoint=settings.oidc_token_endpoint,
+        upstream_client_id=settings.oidc_client_id,
+        upstream_client_secret=settings.oidc_client_secret or None,
         token_verifier=verifier,
-        authorization_servers=[settings.oidc_issuer],
         base_url=settings.public_base_url,
-        scopes_supported=["openid", "profile", "groups"],
-        resource_name="HICO Skill Library",
+        redirect_path="/auth/callback",
+        valid_scopes=["openid", "profile", "groups"],
+        token_endpoint_auth_method=None if settings.oidc_client_secret else "none",
     )
 
 
