@@ -47,10 +47,28 @@
           </ul>
         </details>
       </div>
-      <p class="hint">
-        Issuer <code>{{ISSUER}}</code> · Client-ID <code>{{CLIENT_ID}}</code> ·
-        Scopes <code>openid profile groups</code> · Transport Streamable HTTP
-      </p>
+      <div class="conn-card">
+        <h3>Verbindungsdaten</h3>
+        <div class="conn-row">
+          <span class="conn-label">MCP-Server-URL</span>
+          <code class="conn-val" id="cv-url">{{MCP_URL}}</code>
+          <button class="copy-btn" type="button" data-copy="cv-url">Kopieren</button>
+        </div>
+        <div class="conn-row">
+          <span class="conn-label">Client-ID</span>
+          <code class="conn-val conn-emphasis" id="cv-cid">{{CLIENT_ID}}</code>
+          <button class="copy-btn" type="button" data-copy="cv-cid">Kopieren</button>
+        </div>
+        <div class="conn-row">
+          <span class="conn-label">Issuer</span>
+          <code class="conn-val" id="cv-iss">{{ISSUER}}</code>
+          <button class="copy-btn" type="button" data-copy="cv-iss">Kopieren</button>
+        </div>
+        <div class="conn-row">
+          <span class="conn-label">Scopes</span>
+          <code class="conn-val">openid profile groups</code>
+        </div>
+      </div>
     </section>
 
     <section class="skills">
