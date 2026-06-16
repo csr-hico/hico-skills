@@ -21,9 +21,8 @@ against Authentik. Access is limited to members of the configured group.
 
 ## OpenAI
 
-- **ChatGPT** (Developer mode / Connectors): add the MCP server URL `<MCP_URL>`.
-  - For authentication, choose **Dynamic Client Registration (DCR) / "dynamic"** - **not** CIMD. The
-    server registers the client automatically; you do not enter any endpoints or a metadata URL.
+- **ChatGPT** (Developer mode / Connectors): add the MCP server URL `<MCP_URL>` and log in. No
+  advanced OAuth settings needed - the client registers automatically (DCR and CIMD both work).
 - **Responses API**: `tools: [{ "type": "mcp", "server_url": "<MCP_URL>", "require_approval": ... }]`
   with the authorization token.
 
