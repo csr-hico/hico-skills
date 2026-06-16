@@ -95,6 +95,10 @@ h2 { font-size: 1.25rem; border-left: 4px solid var(--accent); padding-left: 0.6
 }
 .copy-btn:hover { background: var(--brand-blue); color: #fff; }
 .copy-btn.copied { background: #1f9d55; border-color: #1f9d55; color: #fff; }
+.conn-note { color: var(--muted); font-size: 0.85rem; margin: 0.4rem 0 0.2rem; }
+.conn-manual { margin-top: 0.5rem; }
+.conn-manual > summary { cursor: pointer; color: var(--muted); font-size: 0.85rem; }
+.conn-manual[open] > summary { margin-bottom: 0.5rem; }
 code {
   background: #f0f2f5;
   padding: 0.1rem 0.35rem;

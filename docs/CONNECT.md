@@ -3,12 +3,14 @@
 The server is a remote MCP server over **Streamable HTTP**, gated by OIDC (OAuth 2.1 / PKCE)
 against Authentik. Access is limited to members of the configured group.
 
-> Placeholders below are filled in live on the OnePager (behind login). Replace by hand here:
-> - `<MCP_URL>` - e.g. `https://your-domain/mcp`
-> - `<ISSUER>` - the Authentik OIDC issuer for this app
-> - `<CLIENT_ID>` - the public client id
+> **You only need the MCP server URL** (`<MCP_URL>`). Clients (Claude, ChatGPT) register
+> themselves automatically via DCR/CIMD - no client id, secret, or endpoints to enter.
 >
-> Scopes: `openid profile groups`
+> The values below are only for a manual/fallback setup (a client that cannot self-register);
+> they are shown live on the OnePager behind login:
+> - `<ISSUER>` - the OIDC issuer for this app
+> - `<CLIENT_ID>` - the public client id
+> - Scopes: `openid profile groups`
 
 ## Claude
 
@@ -21,9 +23,8 @@ against Authentik. Access is limited to members of the configured group.
 
 ## OpenAI
 
-- **ChatGPT** (Developer mode / Connectors): add the MCP server URL `<MCP_URL>`.
-  - For authentication, choose **Dynamic Client Registration (DCR) / "dynamic"** - **not** CIMD. The
-    server registers the client automatically; you do not enter any endpoints or a metadata URL.
+- **ChatGPT** (Developer mode / Connectors): add the MCP server URL `<MCP_URL>` and log in. No
+  advanced OAuth settings needed - the client registers automatically (DCR and CIMD both work).
 - **Responses API**: `tools: [{ "type": "mcp", "server_url": "<MCP_URL>", "require_approval": ... }]`
   with the authorization token.
 
