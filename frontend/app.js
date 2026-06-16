@@ -12,9 +12,8 @@
     try {
       const me = await (await fetch("/api/me")).json();
       if (me && me.username) {
-        const grp = me.groups && me.groups.length ? " · " + me.groups[0] : "";
         const b = $("badge");
-        b.textContent = me.username + grp;
+        b.textContent = me.username;
         b.hidden = false;
       }
     } catch (_) {
@@ -59,6 +58,25 @@
     }
     render(all);
     $("q").addEventListener("input", (e) => render(filter(e.target.value)));
+
+    document.querySelectorAll(".copy-btn").forEach((btn) => {
+      btn.addEventListener("click", async () => {
+        const el = $(btn.dataset.copy);
+        if (!el) return;
+        try {
+          await navigator.clipboard.writeText(el.textContent.trim());
+          const old = btn.textContent;
+          btn.textContent = "Kopiert!";
+          btn.classList.add("copied");
+          setTimeout(() => {
+            btn.textContent = old;
+            btn.classList.remove("copied");
+          }, 1500);
+        } catch (_) {
+          /* clipboard unavailable */
+        }
+      });
+    });
   }
 
   init();
