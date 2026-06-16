@@ -3,11 +3,11 @@
 :root {
   --brand-orange: #FF5F2C;
   --brand-blue: #2C53AB;
-  --bg: #fbfbfd;
-  --fg: #1a1a1a;
-  --muted: #6b7280;
-  --card: #ffffff;
-  --border: #e6e8eb;
+  --bg: #FFFFFF;        /* Crisp White - guideline: backgrounds */
+  --fg: #030000;        /* Midnight - guideline: primary text */
+  --muted: #5A4F4D;     /* Earthy Clay - neutral, AA-safe secondary text */
+  --card: #FFFFFF;      /* Crisp White */
+  --border: #E1DFDF;    /* Light Mist - subtlest neutral */
   --accent: var(--brand-orange);
   --radius: 10px;
 }
@@ -80,7 +80,7 @@ h2 { font-size: 1.25rem; border-left: 4px solid var(--accent); padding-left: 0.6
   font-size: 1.05rem;
   font-weight: 700;
   color: var(--fg);
-  background: #ffe7df;
+  background: #FFE0DB;  /* Sheen - brand light-orange tint */
   border: 1px solid var(--brand-orange);
   padding: 0.3rem 0.55rem;
 }

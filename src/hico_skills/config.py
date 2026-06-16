@@ -78,5 +78,5 @@ def load_settings(env: dict[str, str] | None = None) -> Settings:
         public_base_url=e.get("PUBLIC_BASE_URL", "").strip(),
         brand_orange=e.get("BRAND_ORANGE", "#FF5F2C").strip(),
         brand_blue=e.get("BRAND_BLUE", "#2C53AB").strip(),
-        bg=e.get("BG", "#fbfbfd").strip(),
+        bg=e.get("BG", "#FFFFFF").strip(),
     )
