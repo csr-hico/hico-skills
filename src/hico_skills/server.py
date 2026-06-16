@@ -60,6 +60,10 @@ def build_auth(settings: Settings) -> OAuthProxy | None:
         redirect_path="/auth/callback",
         valid_scopes=["openid", "profile", "groups"],
         token_endpoint_auth_method=None if settings.oidc_client_secret else "none",
+        # Internal tool: the IdP already authenticates and the HICO group gates access, so the
+        # per-client consent screen only adds a fragile single-use-transaction step (re-hitting
+        # /consent after submit -> "invalid or expired transaction"). Auto-approve instead.
+        require_authorization_consent=False,
     )
 
 
