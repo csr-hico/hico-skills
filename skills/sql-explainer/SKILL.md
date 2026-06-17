@@ -3,7 +3,6 @@ name: SQL Query Explainer
 description: >
   Explains what a SQL query does in plain language, flags likely performance issues (missing
   indexes, N+1 shapes, full scans), and suggests a safer or faster rewrite when warranted.
-type: skill
 triggers:
   - explain this SQL
   - what does this query do

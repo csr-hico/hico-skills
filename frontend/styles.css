@@ -147,6 +147,8 @@ code {
 .row .name { font-weight: 600; }
 .row .wtu { color: var(--muted); font-size: 0.82rem; margin-left: auto; }
 .row .desc { margin: 0.7rem 0 0.2rem; white-space: pre-wrap; }
+.row .files { margin: 0.3rem 0 0.2rem; font-size: 0.8rem; color: var(--muted); }
+.row .files code { background: #f0f2f5; padding: 0.05rem 0.3rem; border-radius: 4px; }
 .empty { color: var(--muted); }
 
 footer {

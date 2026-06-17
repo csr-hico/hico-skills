@@ -9,14 +9,19 @@ All config comes from env/Settings - nothing infra-revealing is hardcoded.
 
 from __future__ import annotations
 
+import base64
+import mimetypes
+
 from fastmcp import FastMCP
 from fastmcp.exceptions import ToolError
+from fastmcp.resources import FileResource
 from fastmcp.server.auth import AuthCheck, AuthContext, OAuthProxy
 from fastmcp.server.auth.providers.jwt import JWTVerifier
 
 from .config import Settings
 from .get import render_definition
 from .guidance import GUIDE_URI, discovery_text
+from .models import AGENT
 from .search import search as core_search
 from .store import SkillStore
 
@@ -101,6 +106,56 @@ def register_tools(mcp: FastMCP, settings: Settings, store: SkillStore) -> None:
         if skill is None:
             raise ToolError(f"unknown id: {id!r}")
         return render_definition(skill)
+
+    @mcp.tool(auth=group_check)
+    def get_resource(id: str, path: str) -> str:
+        """Fetch a file bundled with a skill/agent (a script, template, or reference).
+
+        `path` is one of the relative paths listed under "Bundled files" in `get(id)`. Text is
+        returned as-is; binary content is returned base64-encoded with a `[base64]` prefix.
+        """
+        store.maybe_reload()
+        target = store.resource_path(id, path)
+        if target is None:
+            raise ToolError(f"no bundled file {path!r} for id {id!r}")
+        data = target.read_bytes()
+        try:
+            return data.decode("utf-8")
+        except UnicodeDecodeError:
+            return "[base64]" + base64.b64encode(data).decode("ascii")
+
+
+def register_resources(mcp: FastMCP, settings: Settings, store: SkillStore) -> None:
+    """Expose every bundled file as a group-gated MCP FileResource for native clients.
+
+    Snapshot of the initial load: new files added later are still live via the `get_resource`
+    tool, but appear as MCP resources only after the next restart (Coolify redeploys per push).
+    """
+    group_check = _group_check(settings)
+    for skill in store.all():
+        if skill.dir is None:
+            continue
+        kind = "agents" if skill.type == AGENT else "skills"
+        for rel in skill.resources:
+            mime = mimetypes.guess_type(rel)[0] or "application/octet-stream"
+            is_binary = not (mime.startswith("text/") or mime in _TEXT_MIMES)
+            mcp.add_resource(
+                FileResource(
+                    uri=f"file:///{kind}/{skill.id}/{rel}",
+                    path=(skill.dir / rel).resolve(),
+                    name=f"{skill.id}/{rel}",
+                    description=f"Bundled file for {skill.type} '{skill.name}'",
+                    mime_type=mime,
+                    is_binary=is_binary,
+                    auth=group_check,
+                )
+            )
+
+
+# Common text-ish mimes that don't carry a text/ prefix.
+_TEXT_MIMES = frozenset(
+    {"application/json", "application/x-sh", "application/xml", "application/yaml", "image/svg+xml"}
+)
 
 
 def register_guidance(mcp: FastMCP, settings: Settings) -> None:

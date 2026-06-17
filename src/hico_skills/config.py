@@ -16,6 +16,7 @@ _REPO_ROOT = Path(__file__).resolve().parents[2]
 @dataclass(frozen=True)
 class Settings:
     skills_dir: Path
+    agents_dir: Path
     frontend_dir: Path
     host: str
     port: int
@@ -64,6 +65,7 @@ def load_settings(env: dict[str, str] | None = None) -> Settings:
 
     return Settings(
         skills_dir=Path(e.get("SKILLS_DIR", str(_REPO_ROOT / "skills"))),
+        agents_dir=Path(e.get("AGENTS_DIR", str(_REPO_ROOT / "agents"))),
         frontend_dir=Path(e.get("FRONTEND_DIR", str(_REPO_ROOT / "frontend"))),
         host=e.get("HOST", "0.0.0.0"),
         port=int(e.get("PORT", "8000")),

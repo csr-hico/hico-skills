@@ -20,8 +20,8 @@ from starlette.responses import (
 from .auth import identity_from_headers
 from .config import Settings, load_settings
 from .render import render_index
-from .server import build_auth, register_guidance, register_tools
-from .store import SkillStore
+from .server import build_auth, register_guidance, register_resources, register_tools
+from .store import SkillStore, default_roots
 
 
 def _read(frontend_dir: Path, name: str) -> str:
@@ -48,6 +48,7 @@ def register_routes(mcp: FastMCP, settings: Settings, store: SkillStore) -> None
                     "name": s.name,
                     "description": s.description,
                     "when_to_use": s.when_to_use,
+                    "resources": list(s.resources),
                 }
                 for s in store.all()
             ]
@@ -74,6 +75,7 @@ def register_routes(mcp: FastMCP, settings: Settings, store: SkillStore) -> None
 def build_mcp(settings: Settings, store: SkillStore) -> FastMCP:
     mcp = FastMCP("HICO Skill Library", auth=build_auth(settings))
     register_tools(mcp, settings, store)
+    register_resources(mcp, settings, store)
     register_guidance(mcp, settings)
     register_routes(mcp, settings, store)
     return mcp
@@ -81,7 +83,7 @@ def build_mcp(settings: Settings, store: SkillStore) -> FastMCP:
 
 def build_app(settings: Settings | None = None):
     settings = settings or load_settings()
-    store = SkillStore(settings.skills_dir)
+    store = SkillStore(default_roots(settings.skills_dir, settings.agents_dir))
     store.load()
     mcp = build_mcp(settings, store)
     return mcp.http_app(path="/mcp")

@@ -4,7 +4,6 @@ description: >
   An isolated read-only agent that maps an unfamiliar codebase: entry points, module boundaries,
   data flow, and the few files that matter for a given question - returning a concise structured
   map instead of dumping file contents into the main context.
-type: agent
 when_to_use: When a question requires sweeping many files or directories and you only need the
   conclusion (where things live, how they connect), not the raw file dumps.
 tools: [Read, Grep, Glob]

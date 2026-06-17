@@ -11,8 +11,22 @@ AGENT_SPAWN_DIRECTIVE = (
 )
 
 
+def _resources_section(skill: Skill) -> str:
+    """A trailing note listing bundled files and how to fetch them (tool or MCP resource)."""
+    if not skill.resources:
+        return ""
+    kind = "agents" if skill.type == AGENT else "skills"
+    lines = [
+        "\n\n---\n## Bundled files",
+        f"This {skill.type} ships the files below. Fetch any with the `get_resource` tool "
+        f'(`id="{skill.id}"`, `path="<path>"`) or read the MCP resource '
+        f"`file:///{kind}/{skill.id}/<path>`:",
+    ]
+    lines += [f"- `{rel}`" for rel in skill.resources]
+    return "\n".join(lines)
+
+
 def render_definition(skill: Skill) -> str:
-    """Full body. Agents are prefixed with the spawn-as-isolated-subtask directive."""
-    if skill.type == AGENT:
-        return AGENT_SPAWN_DIRECTIVE + skill.body
-    return skill.body
+    """Full body. Agents get the spawn-as-subtask directive; bundled files are appended."""
+    prefix = AGENT_SPAWN_DIRECTIVE if skill.type == AGENT else ""
+    return prefix + skill.body + _resources_section(skill)

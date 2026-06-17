@@ -11,8 +11,10 @@ RUN pip install --no-cache-dir .
 # Runtime data baked into the image. A skill change is a merge to main -> a rebuild.
 COPY frontend ./frontend
 COPY skills ./skills
+COPY agents ./agents
 
 ENV SKILLS_DIR=/app/skills \
+    AGENTS_DIR=/app/agents \
     FRONTEND_DIR=/app/frontend \
     HOST=0.0.0.0 \
     PORT=8000
