@@ -3,250 +3,229 @@ name: Meeting Minutes from VTT
 triggers:
   - .vtt file uploaded
   - meeting minutes
-  - Meeting-Protokoll
-  - Besprechungsprotokoll
-  - Teams-Transkript
-  - Protokoll aus Transkript
+  - meeting protocol
+  - Teams transcript
+  - minutes from transcript
   - turn this transcript into minutes
-description: Wandelt eine Microsoft-Teams-Transkriptdatei (.vtt) in ein geschliffenes, IBCS-konformes Meeting-Protokoll um. Verwende diesen Skill immer, wenn eine .vtt-Datei hochgeladen wird oder der User von "Meeting Minutes", "Meeting-Protokoll", "Besprechungsprotokoll", "Teams-Transkript" oder "Protokoll aus Transkript" spricht — auch wenn das Wort "VTT" gar nicht fällt. Erkennt automatisch Deutsch oder Englisch, parst Sprecher und Aussagen aus dem WEBVTT-Format und liefert sauber strukturierte Minutes nach IBCS-Pyramidenprinzip (Aussage zuerst, dann Evidenz) im Christoph-Schmeisser-E-Mail-Stil. Auf Wunsch produziert er zusätzlich eine Outlook-fertige E-Mail-Variante mit GROSSBUCHSTABEN-Überschriften.
+description: >
+  Turns a Microsoft Teams transcript file (.vtt) into a polished, IBCS-compliant set of meeting
+  minutes. Use this skill whenever a .vtt file is uploaded or the user mentions "meeting minutes",
+  "meeting protocol", "minutes from transcript" or a "Teams transcript" - even if the word "VTT"
+  is never used. It auto-detects German or English, parses speakers and utterances from the WEBVTT
+  format, and produces cleanly structured minutes following the IBCS pyramid principle (message
+  first, then evidence) in the Christoph Schmeisser email style. On request it additionally
+  produces an Outlook-ready email variant with UPPERCASE headings.
 ---
 
-# Meeting Minutes aus VTT-Transkript
+# Meeting Minutes from a VTT Transcript
 
-## Zweck
+## Purpose
 
-Aus einer Microsoft-Teams-Transkriptdatei (`.vtt`) ein vollständiges,
-geschliffenes Meeting-Protokoll erzeugen. Output ist in derselben Sprache wie
-das Transkript (Deutsch oder Englisch), folgt den IBCS-Prinzipien (Pyramide
-vom Groben zum Detail, MECE-Strukturen, Aussage zuerst, präzise Sprache) und
-ist sofort als E-Mail oder OneNote-Eintrag verwendbar.
+Produce complete, polished meeting minutes from a Microsoft Teams transcript
+file (`.vtt`). The output is in the same language as the transcript (German or
+English), follows IBCS principles (pyramid from broad to detail, MECE
+structures, message first, precise language) and is immediately usable as an
+email or OneNote entry.
 
-Die Logik dieses Skills ist eine eigenständige Portierung des n8n-Workflows
-"Teams Meeting Minutes Automation" (Workflow-ID `10v6Nbtf9Jq44GQ4` im
-n8n_hico-Server). Der Workflow läuft automatisiert alle 15 Minuten auf
-abgeschlossenen Teams-Meetings; dieser Skill macht dieselbe Aufbereitung
-manuell für eine einzelne hochgeladene VTT-Datei.
+The logic of this skill is a standalone port of the n8n workflow "Teams Meeting
+Minutes Automation" (workflow ID `10v6Nbtf9Jq44GQ4` on the n8n_hico server).
+That workflow runs automatically every 15 minutes against completed Teams
+meetings; this skill performs the same processing manually for a single
+uploaded VTT file.
 
-## Wann auslösen
+## When to trigger
 
-Trigger den Skill, sobald eines davon zutrifft:
+Trigger the skill as soon as one of these applies:
 
-- Eine `.vtt`-Datei wird hochgeladen
-- Der User fragt nach "Meeting Minutes", "Meeting-Protokoll",
-  "Besprechungsprotokoll", "Teams-Protokoll", "Protokoll aus Transkript"
-- Der User übergibt einen Teams-Transkript-Inhalt (auch als Text-Paste) und
-  möchte ihn aufbereitet bekommen
+- A `.vtt` file is uploaded
+- The user asks for "meeting minutes", "meeting protocol", "minutes from
+  transcript", or a "Teams transcript" write-up
+- The user hands over Teams transcript content (also as pasted text) and wants
+  it cleaned up
 
-## Ablauf
+## Procedure
 
-Der Skill arbeitet in vier Schritten. Jeder Schritt baut auf dem vorherigen auf.
+The skill works in four steps. Each step builds on the previous one.
 
-### Schritt 1 — VTT-Datei einlesen und parsen
+### Step 1 - Read and parse the VTT file
 
-Verwende das Skript `scripts/parse_vtt.py`, um das WEBVTT-Format in eine saubere
-Sprecher/Aussage-Struktur umzuwandeln. Das Skript:
+Use the script `scripts/parse_vtt.py` to convert the WEBVTT format into a clean
+speaker/utterance structure. The script:
 
-- entfernt WEBVTT-Header, Cue-Timestamps und `-->`-Marker
-- erkennt `<v Sprechername>...</v>`-Tags und ordnet Folgezeilen ohne Tag dem
-  aktuellen Sprecher zu
-- entfernt innere HTML-Tags
-- erkennt automatisch die Sprache (Deutsch/Englisch) per Stopword-Analyse +
-  Umlaute (Umlaute zählen doppelt)
+- strips the WEBVTT header, cue timestamps, and `-->` markers
+- detects `<v SpeakerName>...</v>` tags and assigns following untagged lines to
+  the current speaker
+- removes inner HTML tags
+- auto-detects the language (German/English) via stopword analysis + umlauts
+  (umlauts count double)
 
-Aufruf:
+Invocation:
 
 ```bash
-python3 scripts/parse_vtt.py /pfad/zur/datei.vtt
+python3 scripts/parse_vtt.py /path/to/file.vtt
 ```
 
-Output ist ein JSON-Objekt mit `clean_transcript`, `language`, `language_name`,
-`speakers` und `utterance_count`. Lies dieses JSON ein, bevor du weitermachst.
+The output is a JSON object with `clean_transcript`, `language`,
+`language_name`, `speakers` and `utterance_count`. Read this JSON before moving
+on.
 
-Falls das Skript nicht verfügbar ist, kannst du dieselbe Logik auch direkt in
-einer einmaligen Python-Zelle anwenden — die Logik ist im Skript dokumentiert.
+If the script is not available, you can apply the same logic directly in a
+one-off Python cell - the logic is documented in the script.
 
-### Schritt 2 — Meta-Informationen erfragen oder ableiten
+### Step 2 - Ask for or derive meta information
 
-Frage den User höflich nach den Meta-Infos, die NICHT aus der VTT-Datei kommen,
-aber für den Header gebraucht werden:
+Politely ask the user for the meta info that does NOT come from the VTT file but
+is needed for the header:
 
-- **Subject** (Meeting-Titel) — falls nicht aus dem Dateinamen ableitbar
-- **Date** (Datum + Zeitraum, z. B. `25.04.2026, 10:00 – 11:00 Uhr`)
-- **Organizer** (Name + ggf. E-Mail)
-- **Attendees** (Liste, kann oft aus den `speakers` aus Schritt 1 abgeleitet
-  werden, aber Teilnehmer ohne Wortmeldung fehlen dort)
+- **Subject** (meeting title) - if not derivable from the file name
+- **Date** (date + time range, e.g. `25.04.2026, 10:00 - 11:00 Uhr`)
+- **Organizer** (name and, if available, email)
+- **Attendees** (list; often derivable from the `speakers` from step 1, but
+  attendees who never spoke are missing there)
 
-Wenn der User die Infos schon in der ursprünglichen Anfrage geliefert hat, NICHT
-nochmal nachfragen — dann direkt verwenden.
+If the user already provided the info in the original request, do NOT ask
+again - use it directly.
 
-**Datumsformat — strikt nach Schmeisser-Stil:**
+**Date format - strictly per the Schmeisser style:**
 
-- Deutsch: `25.04.2026, 10:00 – 11:00 Uhr`
-- Englisch: `2026-04-25, 10:00 – 11:00 CEST` (Zeitzone bei Englisch immer dazu)
+- German: `25.04.2026, 10:00 - 11:00 Uhr`
+- English: `2026-04-25, 10:00 - 11:00 CEST` (always include the time zone for
+  English)
 
-### Schritt 3 — Meeting Minutes generieren
+### Step 3 - Generate the meeting minutes
 
-Erzeuge die Minutes nach exakt dieser Struktur. Die Sektions-Überschriften
-übersetzt du in die erkannte Sprache.
+Produce the minutes in exactly this structure. Translate the section headings
+into the detected language.
 
-#### Output-Struktur (Markdown)
+#### Output structure (Markdown)
 
 ```markdown
 ## **Meeting Minutes: <Subject>**
-**Date**: <Datumsangabe>
+**Date**: <date>
 **Organizer**: <Name <email>>
-**Attendees**: <Liste>
+**Attendees**: <list>
 
 ## **Summary**
-<2-4 Sätze, die die Kernaussage des Meetings transportieren — NICHT nur
-beschreiben, dass das Meeting stattfand. Wer nur die Summary liest, muss
-verstehen, was rauskam und was als nächstes passiert.>
+<2-4 sentences that convey the core message of the meeting - NOT just a
+description that the meeting took place. Anyone who reads only the summary must
+understand what came out of it and what happens next.>
 
 ## **Topics Discussed**
-- <Thema 1 als Nominalphrase>
-- <Thema 2 als Nominalphrase>
+- <Topic 1 as a noun phrase>
+- <Topic 2 as a noun phrase>
 - ...
 
 ## **Decisions**
-- <Entscheidung 1, getroffen von <Person/Gruppe>>
-- <Entscheidung 2, getroffen von <Person/Gruppe>>
-- (Falls keine: "Keine Entscheidungen getroffen." / "No decisions made.")
+- <Decision 1, made by <person/group>>
+- <Decision 2, made by <person/group>>
+- (If none: "No decisions made." / "Keine Entscheidungen getroffen.")
 
 ## **Action Items**
-- **<Owner>** – <Aufgabe als Imperativ + Substantiv> – Fällig: **<Datum>**
-- **<Owner>** – <Aufgabe> – Fällig: **<Datum>**
-- (Bei fehlendem Owner: **Unzugeordnet** / **Unassigned**)
-- (Bei fehlendem Datum: **Kein Termin** / **No deadline**)
+- **<Owner>** - <task as imperative + noun> - Due: **<date>**
+- **<Owner>** - <task> - Due: **<date>**
+- (If owner missing: **Unassigned** / **Unzugeordnet**)
+- (If date missing: **No deadline** / **Kein Termin**)
 
 ## **Next Meeting**
-<Nur einbinden, wenn im Transkript erwähnt — sonst Sektion komplett weglassen.>
+<Only include if mentioned in the transcript - otherwise omit the section
+entirely.>
 ```
 
-#### Sprachregel — kompromisslos
+#### Language rule - non-negotiable
 
-Schreibe die KOMPLETTE Antwort in der erkannten Sprache: Überschriften,
-Sektions-Labels, Bullet-Punkte, Platzhalter-Texte und jedes weitere Wort. Wenn
-das Transkript Englisch ist, ist alles auf Englisch. Wenn Deutsch, alles auf
-Deutsch. Niemals mischen. Selbst die Header-Labels (`Date`, `Organizer`,
-`Attendees`) werden übersetzt — nur die Werte bleiben verbatim.
+Write the ENTIRE answer in the detected language: headings, section labels,
+bullet points, placeholder texts, and every other word. If the transcript is in
+English, everything is in English. If German, everything is in German. Never
+mix. Even the header labels (`Date`, `Organizer`, `Attendees`) are translated -
+only the values stay verbatim.
 
-Deutsche Übersetzung der Header-Labels:
-- `Date` → `Datum`
-- `Organizer` → `Organisator`
-- `Attendees` → `Teilnehmer`
-- `Meeting Minutes` → `Meeting-Protokoll`
+German translation of the header labels:
+- `Date` -> `Datum`
+- `Organizer` -> `Organisator`
+- `Attendees` -> `Teilnehmer`
+- `Meeting Minutes` -> `Meeting-Protokoll`
 
-Deutsche Übersetzung der Sektions-Überschriften:
-- `Summary` → `Zusammenfassung`
-- `Topics Discussed` → `Diskutierte Themen`
-- `Decisions` → `Entscheidungen`
-- `Action Items` → `Offene Aufgaben`
-- `Next Meeting` → `Nächstes Meeting`
+German translation of the section headings:
+- `Summary` -> `Zusammenfassung`
+- `Topics Discussed` -> `Diskutierte Themen`
+- `Decisions` -> `Entscheidungen`
+- `Action Items` -> `Offene Aufgaben`
+- `Next Meeting` -> `Nächstes Meeting`
 
-#### Inhaltliche Regeln (IBCS, siehe `references/ibcs_principles.md`)
+#### Content rules (IBCS, see `references/ibcs_principles.md`)
 
-1. **Aussage zuerst (SA 3.2)** — Die Summary muss die Kernaussage des Meetings
-   liefern, nicht den Verlauf beschreiben. Falscher Reflex: "Im Meeting wurde
-   über X gesprochen." Richtig: "X wird bis Datum Y umgesetzt, weil Z."
+1. **Message first (SA 3.2)** - The summary must deliver the core message of the
+   meeting, not describe its course. Wrong reflex: "The meeting discussed X."
+   Right: "X will be implemented by date Y, because Z."
 
-2. **Präzise Worte (SA 4.2)** — Keine schwammigen Begriffe wie "zeitnah",
-   "relevant", "in Kürze", "demnächst". Nutze Datumsangaben, Namen, Zahlen.
+2. **Precise words (SA 4.2)** - No vague terms like "soon", "relevant",
+   "shortly", "in the near future". Use dates, names, numbers.
 
-3. **Konsistente Aussage-Typen pro Sektion (ST 1.2)** —
-   - "Topics Discussed": nur Themen (Nominalphrasen)
-   - "Decisions": nur getroffene Entscheidungen (Vergangenheit/Perfekt)
-   - "Action Items": nur offene Aufgaben (Imperativ + Owner + Datum)
-   - Niemals mischen.
+3. **Consistent statement types per section (ST 1.2)** -
+   - "Topics Discussed": topics only (noun phrases)
+   - "Decisions": decisions made only (past tense)
+   - "Action Items": open tasks only (imperative + owner + date)
+   - Never mix.
 
-4. **Konsistentes Wording (ST 1.3)** — Action Items haben IMMER die Form
-   `**Owner** – Task – Fällig: **Datum**`. Nicht abwechselnd mal so, mal anders.
+4. **Consistent wording (ST 1.3)** - Action items always take the form
+   `**Owner** - Task - Due: **Date**`. Not alternating between styles.
 
-5. **MECE (ST 2 + ST 3)** — Eine Information gehört in genau eine Sektion. Eine
-   Entscheidung kommt in "Decisions"; falls daraus eine Aufgabe entsteht, kommt
-   nur die Aufgabe in "Action Items" — nicht die Entscheidung doppelt.
+5. **MECE (ST 2 + ST 3)** - A piece of information belongs in exactly one
+   section. A decision goes into "Decisions"; if a task arises from it, only the
+   task goes into "Action Items" - not the decision twice.
 
-6. **Pyramide (ST 4)** — Header → Summary → Detail-Sektionen. Wer absteigt,
-   bekommt mehr Details.
+6. **Pyramid (ST 4)** - Header -> Summary -> detail sections. Whoever descends
+   gets more detail.
 
-#### Faktentreue
+#### Faithfulness to the facts
 
-- Erfinde nichts. Wenn das Transkript keine Decisions enthält, schreib das
-  explizit hin (Platzhalter), statt etwas zu fingieren.
-- Owner für Action Items NUR vergeben, wenn der Name im Transkript klar
-  zugeordnet wird. Sonst `**Unzugeordnet**` / `**Unassigned**`.
-- Daten/Termine NUR übernehmen, wenn sie im Transkript genannt werden. Sonst
-  `**Kein Termin**` / `**No deadline**`.
+- Invent nothing. If the transcript contains no decisions, state that explicitly
+  (placeholder) instead of fabricating something.
+- Assign an owner to an action item ONLY if the name is clearly attributable in
+  the transcript. Otherwise `**Unassigned**` / `**Unzugeordnet**`.
+- Take over dates/deadlines ONLY if they are mentioned in the transcript.
+  Otherwise `**No deadline**` / `**Kein Termin**`.
 
-#### Was du NICHT tust
+#### What you do NOT do
 
-- Keine Trennlinien (`---`, `***`, `___`) — die Sektions-Überschriften reichen.
-- Keine Präambel ("Hier ist Ihr Protokoll:" etc.) — direkt mit dem Header
-  beginnen.
-- Keine Kommentare nach dem Output ("Hoffe, das hilft!") — der Markdown-Block
-  ist die Antwort.
-- Keine eigene Interpretation oder Bewertung des Meetings — nur das, was im
-  Transkript steht, geschliffen formuliert.
+- No separator lines (`---`, `***`, `___`) - the section headings are enough.
+- No preamble ("Here are your minutes:" etc.) - start directly with the header.
+- No comments after the output ("Hope this helps!") - the Markdown block is the
+  answer.
+- No interpretation or evaluation of the meeting - only what is in the
+  transcript, phrased cleanly.
 
-### Schritt 4 — Optionale E-Mail-Variante (Schmeisser-Stil)
+### Step 4 - Optional email variant (Schmeisser style)
 
-Wenn der User explizit nach einer "E-Mail-Version", "Outlook-Version",
-"versendbaren Version" oder ähnlichem fragt, baue zusätzlich eine zweite
-Variante. Diese folgt der vollständigen Stilanweisung in
-`references/email_style.md` — die wichtigsten Anpassungen:
+If the user explicitly asks for an "email version", "Outlook version",
+"sendable version" or similar, additionally build a second variant. It follows
+the full style instruction in `references/email_style.md` - the most important
+adjustments:
 
-- **Anrede**: `Hallo zusammen,` (DE) bzw. `Hi all,` (EN)
-- **Einleitung** (1-2 Sätze): `anbei das Protokoll für unser Meeting vom <Datum>.`
-- **Überschriften**: in GROSSBUCHSTABEN, ohne Markdown-Sterne, mit
-  Zeilenumbruch danach. Beispiel: `ZUSAMMENFASSUNG` statt `## **Summary**`.
-- **Datums-/Zeitangaben** immer explizit (nicht "morgen", sondern
-  "Dienstag, 28.04.2026"; nicht nur "10:00", sondern "10:00 Uhr" / bei EN
-  "10:00 CEST").
-- **Action Items** als nummerierte Liste mit Verantwortlichkeits-Präfix
-  (`1.  HICO: ...`, `2.  KUNDE: ...`), wenn klar zuordenbar — sonst Owner-Name.
-- **Abschluss**: kurzer Hilfsangebot-Satz, dann Leerzeile, dann
-  `Viele Grüße,\nChristoph Schmeisser` (DE) bzw.
-  `Best regards,\nChristoph Schmeisser` (EN).
-- **Keine Markdown-Formatierung** im E-Mail-Body — der Body ist Klartext für
-  Outlook, also keine `#`, keine `**`.
+- **Salutation**: `Hi all,` (EN) or `Hallo zusammen,` (DE)
+- **Intro** (1-2 sentences): `please find attached the minutes for our meeting
+  of <date>.`
+- **Headings**: in UPPERCASE, without Markdown asterisks, with a line break
+  after them. Example: `SUMMARY` instead of `## **Summary**`.
+- **Dates/times** always explicit (not "tomorrow", but "Tuesday, 2026-04-28";
+  not just "10:00", but "10:00 CEST" for English / "10:00 Uhr" for German).
+- **Action items** as a numbered list with a responsibility prefix
+  (`1.  HICO: ...`, `2.  CUSTOMER: ...`) when clearly attributable - otherwise
+  the owner name.
+- **Closing**: a short offer-of-help sentence, then a blank line, then
+  `Best regards,\nChristoph Schmeisser` (EN) or
+  `Viele Grüße,\nChristoph Schmeisser` (DE).
+- **No Markdown formatting** in the email body - the body is plain text for
+  Outlook, so no `#`, no `**`.
 
-## Beispiel — Deutscher Output
+## Example - English output
 
-Eingang: VTT-Datei aus einem Meeting zwischen Christoph Schmeisser und Daniele
-Müller über die Serverauslegung am 25.04.2026.
-
-```markdown
-## **Meeting-Protokoll: Serverauslegung TRUECHART-Umgebung**
-**Datum**: 25.04.2026, 10:00 – 11:00 Uhr
-**Organisator**: Christoph Schmeisser <christoph.schmeisser@hico-group.com>
-**Teilnehmer**: Christoph Schmeisser, Daniele Müller
-
-## **Zusammenfassung**
-Die neue TRUECHART-Umgebung wird mit 32 GB RAM und 8 vCPUs ausgelegt, um die
-erwartete Last von 50 gleichzeitigen Usern abzudecken. Daniele liefert bis
-Freitag, 02.05.2026, das finale Sizing-Dokument; HICO setzt anschließend die
-Bestellung beim Hosting-Partner auf.
-
-## **Diskutierte Themen**
-- Mindestanforderungen für RAM und CPU
-- Erwartete Anzahl gleichzeitiger User
-- Backup-Strategie für die VM
-- Rollout-Zeitplan bis Q3 2026
-
-## **Entscheidungen**
-- Sizing wird auf 32 GB RAM / 8 vCPUs festgelegt (Christoph + Daniele)
-- Tägliche Snapshots werden über den Hosting-Partner eingerichtet (Daniele)
-
-## **Offene Aufgaben**
-- **Daniele** – Sizing-Dokument finalisieren und an HICO senden – Fällig: **02.05.2026**
-- **HICO** – Bestellung beim Hosting-Partner aufsetzen – Fällig: **09.05.2026**
-- **Christoph** – Rollout-Plan im nächsten Jour Fixe vorstellen – Fällig: **Kein Termin**
-```
-
-## Beispiel — Englischer Output
+Input: VTT file from a meeting between Christoph Schmeisser and Daniele Müller
+about server sizing on 2026-04-25.
 
 ```markdown
 ## **Meeting Minutes: TRUECHART Server Sizing**
-**Date**: 2026-04-25, 10:00 – 11:00 CEST
+**Date**: 2026-04-25, 10:00 - 11:00 CEST
 **Organizer**: Christoph Schmeisser <christoph.schmeisser@hico-group.com>
 **Attendees**: Christoph Schmeisser, Daniele Müller
 
@@ -267,35 +246,63 @@ partner.
 - Daily snapshots will be configured via the hosting partner (Daniele)
 
 ## **Action Items**
-- **Daniele** – Finalize the sizing document and send it to HICO – Due: **2026-05-02**
-- **HICO** – Place the order with the hosting partner – Due: **2026-05-09**
-- **Christoph** – Present the rollout plan in the next Jour Fixe – Due: **No deadline**
+- **Daniele** - Finalize the sizing document and send it to HICO - Due: **2026-05-02**
+- **HICO** - Place the order with the hosting partner - Due: **2026-05-09**
+- **Christoph** - Present the rollout plan in the next Jour Fixe - Due: **No deadline**
 ```
 
-## Referenzen
+## Example - German output
 
-- `references/ibcs_principles.md` — IBCS-Auszug mit den für Meeting Minutes
-  relevanten SAY- und STRUCTURE-Regeln. Lies dies, wenn unklar ist, wie eine
-  Sektion strukturiert werden soll.
-- `references/email_style.md` — vollständige E-Mail-Stilanweisung
-  von Christoph Schmeisser. Lies dies, sobald der User eine E-Mail-Variante
-  möchte.
-- `scripts/parse_vtt.py` — Python-Portierung der VTT-Parser-Logik aus dem
-  n8n-Workflow. Erste Wahl für das Einlesen.
+```markdown
+## **Meeting-Protokoll: Serverauslegung TRUECHART-Umgebung**
+**Datum**: 25.04.2026, 10:00 - 11:00 Uhr
+**Organisator**: Christoph Schmeisser <christoph.schmeisser@hico-group.com>
+**Teilnehmer**: Christoph Schmeisser, Daniele Müller
 
-## Hintergrund — Warum dieser Skill?
+## **Zusammenfassung**
+Die neue TRUECHART-Umgebung wird mit 32 GB RAM und 8 vCPUs ausgelegt, um die
+erwartete Last von 50 gleichzeitigen Usern abzudecken. Daniele liefert bis
+Freitag, 02.05.2026, das finale Sizing-Dokument; HICO setzt anschließend die
+Bestellung beim Hosting-Partner auf.
 
-Der n8n-Workflow `10v6Nbtf9Jq44GQ4` ("Teams Meeting Minutes Automation")
-erledigt diese Aufgabe automatisiert für alle Online-Meetings im Kalender,
-deckt aber drei Fälle nicht ab:
+## **Diskutierte Themen**
+- Mindestanforderungen für RAM und CPU
+- Erwartete Anzahl gleichzeitiger User
+- Backup-Strategie für die VM
+- Rollout-Zeitplan bis Q3 2026
 
-1. **Externe VTT-Dateien** — z. B. weitergeleitete Transkripte aus Meetings, in
-   denen der User nicht selbst Organizer war.
-2. **Manuelle Anpassung** — wenn der automatisch erzeugte Output nochmal
-   überarbeitet werden muss, bevor er rausgeht.
-3. **Iteratives Arbeiten** — wenn der User mehrere Anpassungs-Runden braucht
-   (Tonalität, Granularität, zusätzliche Sektionen).
+## **Entscheidungen**
+- Sizing wird auf 32 GB RAM / 8 vCPUs festgelegt (Christoph + Daniele)
+- Tägliche Snapshots werden über den Hosting-Partner eingerichtet (Daniele)
 
-Dieser Skill schließt diese Lücke und nutzt dabei dieselbe Parsing- und
-Strukturierungs-Logik wie der Workflow, ergänzt um IBCS-Konformität und den
-Schmeisser-E-Mail-Stil.
+## **Offene Aufgaben**
+- **Daniele** - Sizing-Dokument finalisieren und an HICO senden - Fällig: **02.05.2026**
+- **HICO** - Bestellung beim Hosting-Partner aufsetzen - Fällig: **09.05.2026**
+- **Christoph** - Rollout-Plan im nächsten Jour Fixe vorstellen - Fällig: **Kein Termin**
+```
+
+## References
+
+- `references/ibcs_principles.md` - IBCS excerpt with the SAY and STRUCTURE
+  rules relevant to meeting minutes. Read this when it is unclear how a section
+  should be structured.
+- `references/email_style.md` - the full email style instruction by Christoph
+  Schmeisser. Read this as soon as the user wants an email variant.
+- `scripts/parse_vtt.py` - Python port of the VTT parser logic from the n8n
+  workflow. First choice for reading the file in.
+
+## Background - Why this skill?
+
+The n8n workflow `10v6Nbtf9Jq44GQ4` ("Teams Meeting Minutes Automation") handles
+this task automatically for all online meetings in the calendar, but does not
+cover three cases:
+
+1. **External VTT files** - e.g. forwarded transcripts from meetings in which
+   the user was not the organizer.
+2. **Manual adjustment** - when the auto-generated output needs another pass
+   before it goes out.
+3. **Iterative work** - when the user needs several rounds of adjustment (tone,
+   granularity, additional sections).
+
+This skill closes that gap while using the same parsing and structuring logic as
+the workflow, extended with IBCS compliance and the Schmeisser email style.

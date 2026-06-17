@@ -1,116 +1,117 @@
-# IBCS-PRINZIPIEN FÜR MEETING MINUTES
+# IBCS PRINCIPLES FOR MEETING MINUTES
 
-Diese Datei fasst die für Meeting Minutes relevanten IBCS-Regeln (International
-Business Communication Standards, Version 1.2) zusammen. Die Minutes sind ein
-schriftlicher Report — also gelten primär die konzeptionellen Regeln aus den
-SUCCESS-Sektionen **SAY** (Convey a message) und **STRUCTURE** (Organize content).
+This file summarizes the IBCS rules (International Business Communication
+Standards, version 1.2) relevant to meeting minutes. Minutes are a written
+report - so the conceptual rules from the SUCCESS sections **SAY** (Convey a
+message) and **STRUCTURE** (Organize content) apply primarily.
 
-Die perzeptuellen Regeln (EXPRESS, SIMPLIFY, CONDENSE, CHECK) und die UNIFY-Regeln
-betreffen primär Charts/Tabellen und sind hier nicht direkt anwendbar.
-
----
-
-## SUCCESS-Formel im Überblick
-
-| Buchstabe | Bedeutung | Relevanz für Minutes |
-|-----------|-----------|----------------------|
-| **S**AY | Convey a message | **Hoch** — die Minutes müssen eine klare Aussage haben |
-| **U**NIFY | Apply semantic notation | Niedrig — keine Charts |
-| **C**ONDENSE | Increase information density | Mittel — kompakt halten |
-| **C**HECK | Ensure visual integrity | Niedrig — keine Charts |
-| **E**XPRESS | Choose proper visualization | Niedrig — Text-Output |
-| **S**IMPLIFY | Avoid clutter | Mittel — kein Geschwafel |
-| **S**TRUCTURE | Organize content | **Hoch** — MECE, hierarchisch, konsistent |
+The perceptual rules (EXPRESS, SIMPLIFY, CONDENSE, CHECK) and the UNIFY rules
+primarily concern charts/tables and are not directly applicable here.
 
 ---
 
-## SAY — Convey a message (Aussage transportieren)
+## The SUCCESS formula at a glance
 
-### SA 3.2 SAY MESSAGE FIRST (Pyramidenprinzip nach Barbara Minto)
-Die Kernaussage kommt **zuerst**, der Beweis danach. Bei Meeting Minutes heißt das:
-- Die "Summary"-Sektion am Anfang muss die wichtigsten Outcomes des Meetings
-  in 2-4 Sätzen liefern — nicht nur beschreiben, dass das Meeting stattfand.
-- Erst danach kommen "Topics Discussed", "Decisions", "Action Items".
-- Wer nur die Summary liest, muss verstehen, was im Meeting passiert ist und
-  was als nächstes zu tun ist.
+| Letter | Meaning | Relevance for minutes |
+|--------|---------|-----------------------|
+| **S**AY | Convey a message | **High** - the minutes must have a clear message |
+| **U**NIFY | Apply semantic notation | Low - no charts |
+| **C**ONDENSE | Increase information density | Medium - keep it compact |
+| **C**HECK | Ensure visual integrity | Low - no charts |
+| **E**XPRESS | Choose proper visualization | Low - text output |
+| **S**IMPLIFY | Avoid clutter | Medium - no waffle |
+| **S**TRUCTURE | Organize content | **High** - MECE, hierarchical, consistent |
+
+---
+
+## SAY - Convey a message
+
+### SA 3.2 SAY MESSAGE FIRST (pyramid principle after Barbara Minto)
+The core message comes **first**, the evidence after. For meeting minutes this
+means:
+- The "Summary" section at the start must deliver the most important outcomes of
+  the meeting in 2-4 sentences - not merely describe that the meeting took place.
+- Only after that come "Topics Discussed", "Decisions", "Action Items".
+- Whoever reads only the summary must understand what happened in the meeting
+  and what is to be done next.
 
 ### SA 3.1 DETECT, EXPLAIN, OR SUGGEST
-Aussagen in Reports sollen entweder etwas **feststellen** (detection),
-**erklären** (explanation) oder **vorschlagen** (suggestion). Keine vagen
-Beschreibungen.
-- Schlecht: "Es wurde über das Budget gesprochen."
-- Gut: "Das Q3-Budget wurde um 15 % gekürzt, weil Projekt Y verschoben wurde."
+Statements in reports should either **detect** something (detection),
+**explain** something (explanation), or **suggest** something (suggestion). No
+vague descriptions.
+- Bad: "The budget was discussed."
+- Good: "The Q3 budget was cut by 15% because project Y was postponed."
 
 ### SA 4.2 USE PRECISE WORDS
-Unmissverständliche Sprache. Keine schwammigen Wörter wie "relevant",
-"signifikant", "zeitnah", "in Kürze". Stattdessen: konkrete Zahlen, Daten, Namen.
-- Schlecht: "Wir werden zeitnah eine Lösung finden."
-- Gut: "Bis Freitag, 02.05.2026, liefert HICO einen Lösungsvorschlag."
+Unambiguous language. No vague words like "relevant", "significant", "soon",
+"shortly". Instead: concrete numbers, dates, names.
+- Bad: "We will find a solution soon."
+- Good: "By Friday, 2026-05-02, HICO will deliver a proposed solution."
 
 ### SA 4.4 NAME SOURCES
-Schriftliche Reports müssen Quellen nennen. Bei Minutes heißt das: jede
-Entscheidung und jedes Action Item bekommt einen **Owner** mit Namen.
+Written reports must name sources. For minutes this means: every decision and
+every action item gets an **owner** with a name.
 
 ### SA 5.2 EXPLAIN CONSEQUENCES
-Reports schließen mit Vorschlägen zu Entscheidungen und deren Konsequenzen ab —
-bei Minutes ist das die "Action Items"- bzw. "Next Meeting"-Sektion.
+Reports close with suggestions for decisions and their consequences - for
+minutes that is the "Action Items" and "Next Meeting" sections.
 
 ---
 
-## STRUCTURE — Organize content (Inhalt organisieren)
+## STRUCTURE - Organize content
 
 ### ST 1 USE CONSISTENT ELEMENTS
 
 #### ST 1.2 USE CONSISTENT TYPES OF STATEMENTS
-Eine Liste sollte nur Aussagen **eines Typs** enthalten. Nicht Detection und
-Suggestion mischen.
-- "Topics Discussed" enthält ausschließlich Themen (Substantive/Nominalphrasen).
-- "Decisions" enthält ausschließlich getroffene Entscheidungen (Vergangenheit).
-- "Action Items" enthält ausschließlich offene Aufgaben (Imperativ + Owner + Datum).
+A list should contain only statements of **one type**. Do not mix detection and
+suggestion.
+- "Topics Discussed" contains only topics (nouns/noun phrases).
+- "Decisions" contains only decisions made (past tense).
+- "Action Items" contains only open tasks (imperative + owner + date).
 
 #### ST 1.3 USE CONSISTENT WORDING
-Innerhalb einer Aufzählung dieselbe grammatikalische Form verwenden.
-- Bei Action Items: immer dieselbe Struktur, z. B. **Owner** – Aufgabe – Fällig: **Datum**.
-- Bei Topics: alle Bullet-Punkte als Nominalphrase, nicht abwechselnd Satz/Phrase.
+Use the same grammatical form within an enumeration.
+- For action items: always the same structure, e.g. **Owner** - Task - Due: **Date**.
+- For topics: every bullet point as a noun phrase, not alternating sentence/phrase.
 
 ### ST 2 BUILD NON-OVERLAPPING ELEMENTS (Mutually Exclusive)
-Die Sektionen dürfen sich **inhaltlich nicht überlappen**.
-- Eine Information gehört entweder zu "Decisions" ODER zu "Action Items" — nicht beides.
-- Ein Thema, das in "Topics Discussed" auftaucht, gehört dort einmal hin —
-  nicht in jeder Sektion erneut.
+The sections must **not overlap** in content.
+- A piece of information belongs either to "Decisions" OR to "Action Items" - not both.
+- A topic that appears in "Topics Discussed" belongs there once - not again in
+  every section.
 
 ### ST 3 BUILD COLLECTIVELY EXHAUSTIVE ELEMENTS
-Die Sektionen müssen **vollständig** sein. Das Standard-Set deckt alle
-relevanten Aspekte eines Meetings ab:
-1. Summary (Kernaussage)
-2. Topics Discussed (Was wurde besprochen)
-3. Decisions (Was wurde entschieden)
-4. Action Items (Was ist zu tun)
-5. Next Meeting (optional, falls genannt)
+The sections must be **complete**. The standard set covers all relevant aspects
+of a meeting:
+1. Summary (core message)
+2. Topics Discussed (what was discussed)
+3. Decisions (what was decided)
+4. Action Items (what is to be done)
+5. Next Meeting (optional, if mentioned)
 
-Zusammen: **MECE** (Mutually Exclusive, Collectively Exhaustive).
+Together: **MECE** (Mutually Exclusive, Collectively Exhaustive).
 
 ### ST 4 BUILD HIERARCHICAL STRUCTURES
-Reports brauchen eine hierarchische Struktur (Pyramidenprinzip):
+Reports need a hierarchical structure (pyramid principle):
 - **Level 1**: Header (Subject, Date, Organizer, Attendees) + Summary
-- **Level 2**: Sektionen (Topics, Decisions, Actions, Next Meeting)
-- **Level 3**: Bullet Points innerhalb der Sektionen
+- **Level 2**: Sections (Topics, Decisions, Actions, Next Meeting)
+- **Level 3**: Bullet points within the sections
 
 ---
 
-## Konkrete Anwendung in Meeting Minutes
+## Concrete application in meeting minutes
 
-| IBCS-Regel | Praktische Auswirkung im Output |
-|------------|--------------------------------|
-| SA 3.2 (Message first) | Summary kommt direkt nach dem Header und enthält die Kernaussage |
-| SA 4.2 (Precise words) | Datums-/Zahlen-/Namensangaben statt Vagheit |
-| ST 1.3 (Consistent wording) | Action Items haben immer die gleiche Form `**Owner** – Task – Due: **Date**` |
-| ST 2 (Non-overlapping) | Eine Info nur in einer Sektion |
-| ST 4 (Hierarchical) | Pyramide: Header → Summary → Sektionen → Bullets |
+| IBCS rule | Practical effect in the output |
+|-----------|--------------------------------|
+| SA 3.2 (Message first) | Summary comes right after the header and contains the core message |
+| SA 4.2 (Precise words) | Date/number/name details instead of vagueness |
+| ST 1.3 (Consistent wording) | Action items always take the same form `**Owner** - Task - Due: **Date**` |
+| ST 2 (Non-overlapping) | One piece of info in only one section |
+| ST 4 (Hierarchical) | Pyramid: Header -> Summary -> sections -> bullets |
 
 ---
 
-## Quelle
+## Source
 
-International Business Communication Standards, Version 1.2,
-IBCS Association, 2022. Lizenziert unter CC BY-SA 4.0.
+International Business Communication Standards, version 1.2,
+IBCS Association, 2022. Licensed under CC BY-SA 4.0.
