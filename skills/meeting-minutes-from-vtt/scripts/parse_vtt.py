@@ -1,20 +1,20 @@
 #!/usr/bin/env python3
 """
-VTT-Parser fuer Microsoft-Teams-Transkripte.
+VTT parser for Microsoft Teams transcripts.
 
-Portiert 1:1 die Logik aus dem n8n-Workflow "Teams Meeting Minutes Automation"
-(ID 10v6Nbtf9Jq44GQ4), Node "Prepare Transcript".
+Ports 1:1 the logic from the n8n workflow "Teams Meeting Minutes Automation"
+(ID 10v6Nbtf9Jq44GQ4), node "Prepare Transcript".
 
-Verwendung:
-    python parse_vtt.py <pfad/zur/datei.vtt>
+Usage:
+    python parse_vtt.py <path/to/file.vtt>
 
-Ausgabe (auf stdout):
-    Eine JSON-Struktur mit:
-      - clean_transcript: bereinigter Text als "Speaker: Aussage"-Zeilen
-      - language: "de" oder "en"
-      - language_name: "Deutsch" oder "English"
-      - speakers: Liste der erkannten Sprecher
-      - utterance_count: Anzahl der Aeusserungen
+Output (to stdout):
+    A JSON structure with:
+      - clean_transcript: cleaned text as "Speaker: utterance" lines
+      - language: "de" or "en"
+      - language_name: "Deutsch" or "English"
+      - speakers: list of detected speakers
+      - utterance_count: number of utterances
 """
 
 import json
@@ -24,13 +24,13 @@ from pathlib import Path
 
 
 def parse_vtt(vtt_text: str) -> dict:
-    """Wandelt rohen VTT-Inhalt in eine "Speaker: Aussage"-Struktur um.
+    """Convert raw VTT content into a "Speaker: utterance" structure.
 
-    Die Logik folgt dem n8n-Workflow:
-    - WEBVTT-Header, Timestamps und Cue-Marker werden uebersprungen
-    - <v Sprecher>...</v>-Tags markieren neue Sprecher
-    - Folgezeilen ohne Tag werden dem aktuellen Sprecher zugeordnet
-    - Innere HTML-Tags werden entfernt
+    The logic follows the n8n workflow:
+    - WEBVTT header, timestamps and cue markers are skipped
+    - <v Speaker>...</v> tags mark new speakers
+    - following lines without a tag are assigned to the current speaker
+    - inner HTML tags are removed
     """
     utterances = []
     speaker = ""
@@ -59,7 +59,7 @@ def parse_vtt(vtt_text: str) -> dict:
     if speaker and buffer:
         utterances.append(f"{speaker}: {buffer.strip()}")
 
-    clean_transcript = "\n".join(utterances) or "(Kein lesbarer Transkriptinhalt verfuegbar)"
+    clean_transcript = "\n".join(utterances) or "(No readable transcript content available)"
 
     speakers = sorted({u.split(":", 1)[0] for u in utterances})
 
@@ -75,10 +75,10 @@ def parse_vtt(vtt_text: str) -> dict:
 
 
 def detect_language(text: str) -> tuple[str, str]:
-    """Erkennt Deutsch oder Englisch via Stopword-Zaehlung + Umlaute.
+    """Detect German or English via stopword counting + umlauts.
 
-    Identische Logik wie im n8n-Workflow: Umlaute zaehlen doppelt,
-    weil sie ein starkes Indiz fuer Deutsch sind.
+    Identical logic to the n8n workflow: umlauts count double, because they are
+    a strong indicator for German.
     """
     sample = text.lower()[:10000]
 
