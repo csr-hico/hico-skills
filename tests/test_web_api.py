@@ -24,7 +24,9 @@ def test_api_skills_shape_includes_description(client):
     assert r.status_code == 200
     data = r.json()
     assert len(data) == 3
-    assert set(data[0]) == {"id", "type", "name", "description", "when_to_use"}
+    assert set(data[0]) == {"id", "type", "name", "description", "when_to_use", "resources"}
+    beta = next(d for d in data if d["id"] == "beta-helper")
+    assert beta["resources"] == ["scripts/run.py", "templates/out.txt"]
 
 
 def test_api_me_reads_forward_auth_headers(client):

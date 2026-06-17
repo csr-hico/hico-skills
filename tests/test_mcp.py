@@ -11,7 +11,7 @@ import asyncio
 from fastmcp import Client
 
 from hico_skills.get import AGENT_SPAWN_DIRECTIVE
-from hico_skills.store import SkillStore
+from hico_skills.store import SkillStore, default_roots
 from hico_skills.web import build_mcp
 
 
@@ -20,20 +20,29 @@ def _run(coro):
 
 
 def test_tools_listed_and_callable(settings):
-    store = SkillStore(settings.skills_dir)
+    store = SkillStore(default_roots(settings.skills_dir, settings.agents_dir))
     store.load()
     mcp = build_mcp(settings, store)
 
     async def go():
         async with Client(mcp) as c:
             names = {t.name for t in await c.list_tools()}
-            assert {"search", "get"} <= names
+            assert {"search", "get", "get_resource"} <= names
 
             res = await c.call_tool("search", {"query": "alpha"})
             assert any(item["id"] == "alpha-skill" for item in res.data)
 
             got = await c.call_tool("get", {"id": "gamma-agent"})
             assert got.data.startswith(AGENT_SPAWN_DIRECTIVE)
+
+            # bundled file fetchable via the tool ...
+            rsrc = await c.call_tool(
+                "get_resource", {"id": "beta-helper", "path": "scripts/run.py"}
+            )
+            assert rsrc.data == "print('hi')\n"
+            # ... and exposed as an MCP resource
+            uris = {str(r.uri) for r in await c.list_resources()}
+            assert "file:///skills/beta-helper/scripts/run.py" in uris
 
             prompts = {p.name for p in await c.list_prompts()}
             assert "use_skill_library" in prompts

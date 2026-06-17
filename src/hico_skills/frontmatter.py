@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import yaml
 
-from .models import VALID_TYPES, Skill
+from .models import SKILL, VALID_TYPES, Skill
 
 _DELIM = "---"
 
@@ -65,8 +65,12 @@ def _normalize_tools(meta: dict) -> tuple[str, ...]:
     return tuple(t.strip() for t in str(tools).split(",") if t.strip())
 
 
-def skill_from_text(text: str, *, skill_id: str) -> Skill:
-    """Parse + validate one skill file's text into a Skill, or raise FrontmatterError."""
+def skill_from_text(text: str, *, skill_id: str, type_: str = SKILL) -> Skill:
+    """Parse + validate one SKILL.md/AGENT.md text into a Skill, or raise FrontmatterError.
+
+    `type_` is supplied by the loader from the root directory (skills/ -> skill, agents/ -> agent);
+    any `type:` in the frontmatter is ignored (the directory is canonical).
+    """
     meta, body = split_frontmatter(text)
 
     name = meta.get("name")
@@ -77,7 +81,7 @@ def skill_from_text(text: str, *, skill_id: str) -> Skill:
     if not description or not str(description).strip():
         raise FrontmatterError(f"{skill_id}: missing required 'description'")
 
-    type_ = str(meta.get("type", "skill")).strip().lower()
+    type_ = str(type_).strip().lower()
     if type_ not in VALID_TYPES:
         raise FrontmatterError(f"{skill_id}: invalid type {type_!r} (allowed: {VALID_TYPES})")
 

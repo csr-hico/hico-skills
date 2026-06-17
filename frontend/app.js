@@ -34,12 +34,15 @@
   function rowHtml(s) {
     const wtu = s.when_to_use ? `<span class="wtu">${esc(s.when_to_use)}</span>` : "";
     const type = s.type === "agent" ? "agent" : "skill";
+    const files = (s.resources || []).length
+      ? `<p class="files">📎 ${s.resources.map((r) => `<code>${esc(r)}</code>`).join(" ")}</p>`
+      : "";
     return `<details class="row">
       <summary>
         <span class="tag ${type}">${esc(s.type)}</span>
         <span class="name">${esc(s.name)}</span>${wtu}
       </summary>
-      <p class="desc">${esc(s.description)}</p>
+      <p class="desc">${esc(s.description)}</p>${files}
     </details>`;
   }
 

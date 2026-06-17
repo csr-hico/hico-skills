@@ -4,7 +4,7 @@ import pytest
 
 from hico_skills.frontmatter import FrontmatterError, skill_from_text, split_frontmatter
 
-from .conftest import BAD_TYPE, MISSING_NAME, NO_FRONTMATTER, VALID_AGENT, VALID_SKILL, VALID_SKILL2
+from .conftest import MISSING_NAME, NO_FRONTMATTER, VALID_AGENT, VALID_SKILL, VALID_SKILL2
 
 
 def test_valid_skill_parsed():
@@ -22,7 +22,7 @@ def test_triggers_collapse_into_when_to_use():
 
 
 def test_valid_agent_type_and_tools():
-    s = skill_from_text(VALID_AGENT, skill_id="gamma-agent")
+    s = skill_from_text(VALID_AGENT, skill_id="gamma-agent", type_="agent")
     assert s.type == "agent"
     assert s.tools == ("Read", "Grep")
 
@@ -38,9 +38,10 @@ def test_missing_description_raises():
         skill_from_text(text, skill_id="x")
 
 
-def test_bad_type_raises():
+def test_bad_type_arg_raises():
+    # type comes from the loader (the root dir); an unknown one is a programming error.
     with pytest.raises(FrontmatterError):
-        skill_from_text(BAD_TYPE, skill_id="x")
+        skill_from_text(VALID_SKILL, skill_id="x", type_="notathing")
 
 
 def test_no_frontmatter_raises_on_validation():

@@ -3,7 +3,6 @@ name: Conventional Commit Writer
 description: >
   Turns a diff or a change summary into a clean Conventional Commits message: a type(scope)
   subject line under 72 chars, an imperative mood, and a concise body explaining the why.
-type: skill
 when_to_use: When the user asks you to write or improve a git commit message.
 ---
 

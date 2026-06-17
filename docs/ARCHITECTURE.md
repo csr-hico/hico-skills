@@ -6,15 +6,20 @@ via `@mcp.custom_route`, the web OnePager + a small JSON API.
 ## Layers
 
 - **Core** (pure, no framework, fully unit-tested):
-  - `frontmatter.py` - parse + validate a markdown file with YAML frontmatter into a `Skill`.
-  - `store.py` - the only filesystem module: load, cache, and cheaply reload `skills/*.md`.
+  - `frontmatter.py` - parse + validate a manifest's YAML frontmatter into a `Skill` (type is
+    supplied by the loader from the root directory, not read from frontmatter).
+  - `store.py` - the only filesystem module: load, cache, and cheaply reload the `skills/<id>/`
+    and `agents/<id>/` folders; discovers each item's bundled files and gates resource access
+    (only enumerated files are returnable - defeats path traversal).
   - `search.py` - substring/token ranking (no vector DB in v1).
-  - `get.py` - render the full definition; agents get a spawn-as-subtask directive.
+  - `get.py` - render the full definition; agents get a spawn-as-subtask directive, and bundled
+    files are listed in a trailing "Bundled files" section.
   - `auth.py` - parse forward-auth headers; the web gating decision.
   - `config.py` - env -> immutable `Settings` (nothing infra-revealing is hardcoded).
   - `render.py` - inject brand colors + connect placeholders into the OnePager.
 - **Adapters** (thin):
-  - `server.py` - the `search`/`get` MCP tools + the OIDC resource-server auth for `/mcp`.
+  - `server.py` - the `search`/`get`/`get_resource` MCP tools, bundled files as group-gated
+    `FileResource`s, + the OIDC resource-server auth for `/mcp`.
   - `web.py` - the `/`, `/api/skills`, `/api/me`, `/healthz`, `/static/*` routes + app assembly.
 
 ## Two auth surfaces (both Authentik, both gated to one group)
@@ -30,9 +35,11 @@ via `@mcp.custom_route`, the web OnePager + a small JSON API.
 
 ## Data flow
 
-Skills are markdown files baked into the image (`skills/`). A skill change is a PR merged to
-`main` -> a Coolify rebuild. The store reloads on a directory-signature change, so local edits are
-picked up without a restart.
+Skills/agents are folders baked into the image (`skills/<id>/SKILL.md`, `agents/<id>/AGENT.md`,
+plus bundled files). A change is a PR merged to `main` -> a Coolify rebuild. The store reloads on a
+file-signature change (covering bundled files too), so local edits are picked up without a restart.
+The `get_resource` tool serves bundled files live; the equivalent `FileResource`s are a startup
+snapshot (they refresh per deploy).
 
 ## What this is NOT (v1)
 

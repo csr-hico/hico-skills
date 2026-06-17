@@ -28,24 +28,38 @@ Then open <http://127.0.0.1:8000/> and hit `http://127.0.0.1:8000/mcp` with an M
 
 ## Add a skill or agent
 
-Drop a markdown file into `skills/` (see `skills/_TEMPLATE.md`). Frontmatter:
+One folder per item (Anthropic Agent-Skills style), with a manifest file plus any bundled files:
+
+```
+skills/<id>/SKILL.md        + scripts/, templates/, references...
+agents/<id>/AGENT.md        + scripts/, templates/, references...
+```
+
+The folder name is the id; the directory it lives in determines the type (no `type:` field).
+See `skills/_TEMPLATE/` and `agents/_TEMPLATE/`. Manifest frontmatter:
 
 ```yaml
 name: Human Readable Name
 description: One or two sentences. This is what the LLM and the UI both see.
-type: skill        # or: agent
 when_to_use: ...   # or a triggers: [..] list
+# tools: [Read, Grep]      # agents only, optional
+# model: claude-opus-4-8   # agents only, optional
 ```
 
-Files starting with `_` are ignored. Invalid files are skipped (the server never crashes on a bad
-contribution) and reported in the load result.
+**Bundled files** (scripts/templates/references) ride along in the folder. They are auto-discovered
+and reachable by MCP clients two ways: the `get_resource(id, path)` tool, and as MCP resources at
+`file:///<skills|agents>/<id>/<path>`. `get(id)` lists them automatically.
+
+Folders/files starting with `_` or `.` are ignored. Invalid items are skipped (the server never
+crashes on a bad contribution) and reported in the load result.
 
 ## Layout
 
 ```
 src/hico_skills/   core (frontmatter/store/search/get/auth/config/render) + adapters (server/web)
 frontend/          index.html, styles.css, app.js (no build step)
-skills/            the *.md definitions (baked into the image)
+skills/            <id>/SKILL.md (+ bundled files), baked into the image
+agents/            <id>/AGENT.md (+ bundled files), baked into the image
 tests/             pytest; nothing merges red
 docs/              ARCHITECTURE.md, CONNECT.md
 ```
@@ -64,4 +78,4 @@ and the project plan for the full provisioning sequence.
 | `MCP_REQUIRED_GROUP` | group the JWT `groups` claim must contain |
 | `PUBLIC_BASE_URL` | used to render the `/mcp` URL in the connect docs |
 | `BRAND_ORANGE` / `BRAND_BLUE` / `BG` | OnePager colors |
-| `SKILLS_DIR` / `FRONTEND_DIR` / `HOST` / `PORT` | paths and bind address |
+| `SKILLS_DIR` / `AGENTS_DIR` / `FRONTEND_DIR` / `HOST` / `PORT` | paths and bind address |
