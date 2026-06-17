@@ -36,7 +36,9 @@ def test_tools_listed_and_callable(settings):
             assert got.data.startswith(AGENT_SPAWN_DIRECTIVE)
 
             # bundled file fetchable via the tool ...
-            rsrc = await c.call_tool("get_resource", {"id": "beta-helper", "path": "scripts/run.py"})
+            rsrc = await c.call_tool(
+                "get_resource", {"id": "beta-helper", "path": "scripts/run.py"}
+            )
             assert rsrc.data == "print('hi')\n"
             # ... and exposed as an MCP resource
             uris = {str(r.uri) for r in await c.list_resources()}
