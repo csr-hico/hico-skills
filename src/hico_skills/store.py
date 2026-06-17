@@ -127,7 +127,11 @@ class SkillStore:
         return False
 
     def all(self) -> list[Skill]:
-        return sorted(self._skills.values(), key=lambda s: s.name.lower())
+        # Skills before agents, then alphabetical by name within each group.
+        return sorted(
+            self._skills.values(),
+            key=lambda s: (0 if s.type == SKILL else 1, s.name.lower()),
+        )
 
     def get(self, skill_id: str) -> Skill | None:
         return self._skills.get(skill_id)

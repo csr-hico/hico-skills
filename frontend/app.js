@@ -49,7 +49,7 @@
   function render(list) {
     $("rows").innerHTML = list.map(rowHtml).join("");
     $("empty").hidden = list.length !== 0;
-    $("count").textContent = `${list.length} von ${all.length} Skills`;
+    $("count").textContent = `${list.length} of ${all.length} skills`;
   }
 
   function filter(q) {
@@ -79,7 +79,7 @@
         try {
           await navigator.clipboard.writeText(el.textContent.trim());
           const old = btn.textContent;
-          btn.textContent = "Kopiert!";
+          btn.textContent = "Copied!";
           btn.classList.add("copied");
           setTimeout(() => {
             btn.textContent = old;

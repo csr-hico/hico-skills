@@ -52,9 +52,9 @@ main { max-width: 880px; margin: 0 auto; padding: 1.5rem; }
 section { margin-bottom: 2.5rem; }
 h1 { font-size: 1.8rem; margin: 0.5rem 0; }
 h2 { font-size: 1.25rem; border-left: 4px solid var(--accent); padding-left: 0.6rem; }
-.intro p { color: var(--muted); max-width: 60ch; }
+.intro p { color: var(--muted); }
 
-.connect-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 0.75rem; }
+.connect-grid { display: flex; flex-direction: column; gap: 0.75rem; }
 .connect details {
   background: var(--card);
   border: 1px solid var(--border);
