@@ -108,10 +108,3 @@ Reports need a hierarchical structure (pyramid principle):
 | ST 1.3 (Consistent wording) | Action items always take the same form `**Owner** - Task - Due: **Date**` |
 | ST 2 (Non-overlapping) | One piece of info in only one section |
 | ST 4 (Hierarchical) | Pyramid: Header -> Summary -> sections -> bullets |
-
----
-
-## Source
-
-International Business Communication Standards, version 1.2,
-IBCS Association, 2022. Licensed under CC BY-SA 4.0.
