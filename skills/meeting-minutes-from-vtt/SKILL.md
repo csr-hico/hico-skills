@@ -13,7 +13,7 @@ description: >
   "meeting protocol", "minutes from transcript" or a "Teams transcript" - even if the word "VTT"
   is never used. It auto-detects German or English, parses speakers and utterances from the WEBVTT
   format, and produces cleanly structured minutes following the IBCS pyramid principle (message
-  first, then evidence) in the Christoph Schmeisser email style. On request it additionally
+  first, then evidence) in the HICO consultant email style. On request it additionally
   produces an Outlook-ready email variant with UPPERCASE headings.
 ---
 
@@ -86,7 +86,7 @@ is needed for the header:
 If the user already provided the info in the original request, do NOT ask
 again - use it directly.
 
-**Date format - strictly per the Schmeisser style:**
+**Date format - strictly per the house style:**
 
 - German: `25.04.2026, 10:00 - 11:00 Uhr`
 - English: `2026-04-25, 10:00 - 11:00 CEST` (always include the time zone for
@@ -195,7 +195,7 @@ German translation of the section headings:
 - No interpretation or evaluation of the meeting - only what is in the
   transcript, phrased cleanly.
 
-### Step 4 - Optional email variant (Schmeisser style)
+### Step 4 - Optional email variant (house style)
 
 If the user explicitly asks for an "email version", "Outlook version",
 "sendable version" or similar, additionally build a second variant. It follows
@@ -213,25 +213,25 @@ adjustments:
   (`1.  HICO: ...`, `2.  CUSTOMER: ...`) when clearly attributable - otherwise
   the owner name.
 - **Closing**: a short offer-of-help sentence, then a blank line, then
-  `Best regards,\nChristoph Schmeisser` (EN) or
-  `Viele Grüße,\nChristoph Schmeisser` (DE).
+  `Best regards,\n<First name> <Last name>` (EN) or
+  `Viele Grüße,\n<First name> <Last name>` (DE).
 - **No Markdown formatting** in the email body - the body is plain text for
   Outlook, so no `#`, no `**`.
 
 ## Example - English output
 
-Input: VTT file from a meeting between Christoph Schmeisser and Daniele Müller
-about server sizing on 2026-04-25.
+Input: VTT file from a meeting between Alex Morgan and Sam Rivera about server
+sizing on 2026-04-25.
 
 ```markdown
 ## **Meeting Minutes: TRUECHART Server Sizing**
 **Date**: 2026-04-25, 10:00 - 11:00 CEST
-**Organizer**: Christoph Schmeisser <christoph.schmeisser@hico-group.com>
-**Attendees**: Christoph Schmeisser, Daniele Müller
+**Organizer**: Alex Morgan <alex.morgan@example.com>
+**Attendees**: Alex Morgan, Sam Rivera
 
 ## **Summary**
 The new TRUECHART environment will be sized at 32 GB RAM and 8 vCPUs to cover
-the expected load of 50 concurrent users. Daniele will deliver the final sizing
+the expected load of 50 concurrent users. Sam will deliver the final sizing
 document by Friday, 2026-05-02; HICO will then place the order with the hosting
 partner.
 
@@ -242,13 +242,13 @@ partner.
 - Rollout timeline through Q3 2026
 
 ## **Decisions**
-- Sizing fixed at 32 GB RAM / 8 vCPUs (Christoph + Daniele)
-- Daily snapshots will be configured via the hosting partner (Daniele)
+- Sizing fixed at 32 GB RAM / 8 vCPUs (Alex + Sam)
+- Daily snapshots will be configured via the hosting partner (Sam)
 
 ## **Action Items**
-- **Daniele** - Finalize the sizing document and send it to HICO - Due: **2026-05-02**
+- **Sam** - Finalize the sizing document and send it to HICO - Due: **2026-05-02**
 - **HICO** - Place the order with the hosting partner - Due: **2026-05-09**
-- **Christoph** - Present the rollout plan in the next Jour Fixe - Due: **No deadline**
+- **Alex** - Present the rollout plan in the next Jour Fixe - Due: **No deadline**
 ```
 
 ## Example - German output
@@ -256,12 +256,12 @@ partner.
 ```markdown
 ## **Meeting-Protokoll: Serverauslegung TRUECHART-Umgebung**
 **Datum**: 25.04.2026, 10:00 - 11:00 Uhr
-**Organisator**: Christoph Schmeisser <christoph.schmeisser@hico-group.com>
-**Teilnehmer**: Christoph Schmeisser, Daniele Müller
+**Organisator**: Alex Morgan <alex.morgan@example.com>
+**Teilnehmer**: Alex Morgan, Sam Rivera
 
 ## **Zusammenfassung**
 Die neue TRUECHART-Umgebung wird mit 32 GB RAM und 8 vCPUs ausgelegt, um die
-erwartete Last von 50 gleichzeitigen Usern abzudecken. Daniele liefert bis
+erwartete Last von 50 gleichzeitigen Usern abzudecken. Sam liefert bis
 Freitag, 02.05.2026, das finale Sizing-Dokument; HICO setzt anschließend die
 Bestellung beim Hosting-Partner auf.
 
@@ -272,13 +272,13 @@ Bestellung beim Hosting-Partner auf.
 - Rollout-Zeitplan bis Q3 2026
 
 ## **Entscheidungen**
-- Sizing wird auf 32 GB RAM / 8 vCPUs festgelegt (Christoph + Daniele)
-- Tägliche Snapshots werden über den Hosting-Partner eingerichtet (Daniele)
+- Sizing wird auf 32 GB RAM / 8 vCPUs festgelegt (Alex + Sam)
+- Tägliche Snapshots werden über den Hosting-Partner eingerichtet (Sam)
 
 ## **Offene Aufgaben**
-- **Daniele** - Sizing-Dokument finalisieren und an HICO senden - Fällig: **02.05.2026**
+- **Sam** - Sizing-Dokument finalisieren und an HICO senden - Fällig: **02.05.2026**
 - **HICO** - Bestellung beim Hosting-Partner aufsetzen - Fällig: **09.05.2026**
-- **Christoph** - Rollout-Plan im nächsten Jour Fixe vorstellen - Fällig: **Kein Termin**
+- **Alex** - Rollout-Plan im nächsten Jour Fixe vorstellen - Fällig: **Kein Termin**
 ```
 
 ## References
@@ -286,8 +286,8 @@ Bestellung beim Hosting-Partner auf.
 - `references/ibcs_principles.md` - IBCS excerpt with the SAY and STRUCTURE
   rules relevant to meeting minutes. Read this when it is unclear how a section
   should be structured.
-- `references/email_style.md` - the full email style instruction by Christoph
-  Schmeisser. Read this as soon as the user wants an email variant.
+- `references/email_style.md` - the full house email style instruction. Read
+  this as soon as the user wants an email variant.
 - `scripts/parse_vtt.py` - Python port of the VTT parser logic from the n8n
   workflow. First choice for reading the file in.
 
@@ -305,4 +305,4 @@ cover three cases:
    granularity, additional sections).
 
 This skill closes that gap while using the same parsing and structuring logic as
-the workflow, extended with IBCS compliance and the Schmeisser email style.
+the workflow, extended with IBCS compliance and the house email style.

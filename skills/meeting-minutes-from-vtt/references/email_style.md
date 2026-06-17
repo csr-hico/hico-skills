@@ -151,7 +151,7 @@ Viele Grüße,
 ### Clarify responsibilities
 - Explicit assignment with a prefix: "HICO:", "CUSTOMER:", "CUSTOMER & HICO:"
 - For multiple parties: name all of them
-- Example: "Daniele and I will keep a closer eye on the project deadlines from now on"
+- Example: "A colleague and I will keep a closer eye on the project deadlines from now on"
 
 ## EMAIL TYPES AND THEIR STRUCTURE
 
@@ -287,12 +287,12 @@ Best regards,
 
 ### Proactive attitude (EN)
 - "we will proactively seek the conversation about [topic]"
-- "Daniele will coordinate and communicate upcoming milestones"
+- "A colleague will coordinate and communicate upcoming milestones"
 - "will keep a closer eye on the project deadlines from now on"
 
 ## SUMMARY
 
-The style of Christoph Schmeisser is characterized by:
+This email style is characterized by:
 1. **Clear IBCS structure** from broad to detail
 2. **Solution-oriented communication** without drama
 3. **Precise technical details** in understandable language
