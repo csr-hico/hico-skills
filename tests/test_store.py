@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from hico_skills.store import SkillStore, default_roots
 
-from .conftest import VALID_SKILL
+from .conftest import VALID_AGENT, VALID_SKILL
 
 
 def test_load_counts_valid_and_collects_errors(store):
@@ -30,6 +30,19 @@ def test_type_comes_from_root_directory(store):
 def test_get_known_and_unknown(store):
     assert store.get("alpha-skill") is not None
     assert store.get("does-not-exist") is None
+
+
+def test_skills_sort_before_agents(tmp_path):
+    skills = tmp_path / "skills"
+    agents = tmp_path / "agents"
+    (skills / "zzz-skill").mkdir(parents=True)
+    (skills / "zzz-skill" / "SKILL.md").write_text(VALID_SKILL, encoding="utf-8")
+    (agents / "aaa-agent").mkdir(parents=True)
+    (agents / "aaa-agent" / "AGENT.md").write_text(VALID_AGENT, encoding="utf-8")
+    s = SkillStore(default_roots(skills, agents))
+    s.load()
+    # skill comes first even though "aaa" < "zzz" alphabetically
+    assert [x.id for x in s.all()] == ["zzz-skill", "aaa-agent"]
 
 
 def test_missing_dirs_do_not_crash(tmp_path):

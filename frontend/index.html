@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="de">
+<html lang="en">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -16,54 +16,54 @@
   <main>
     <section class="intro">
       <h1>Skill &amp; Agent Library</h1>
-      <p>Durchsuchbare Bibliothek von KI-Skills und Agents, bereitgestellt als Remote-MCP-Server. Binde deinen LLM-Client ein - er greift dann selbstständig auf die passenden Skills zu.</p>
+      <p>A searchable library of AI skills and agents, served as a remote MCP server. Connect your LLM client and it will reach for the right skills on its own.</p>
     </section>
     <section class="connect">
-      <h2>MCP-Server einbinden</h2>
+      <h2>Connect the MCP server</h2>
       <div class="connect-grid">
         <details>
           <summary>Claude</summary>
           <ul>
             <li>claude.ai: <em>Settings -&gt; Connectors -&gt; Add custom connector</em>, URL
-              <code>{{MCP_URL}}</code>, dann Authentik-Login.</li>
+              <code>{{MCP_URL}}</code>, then sign in with Authentik.</li>
             <li>Claude Code: <code>claude mcp add --transport http hico-skills {{MCP_URL}}</code></li>
           </ul>
         </details>
         <details>
           <summary>OpenAI</summary>
           <ul>
-            <li>ChatGPT (Developer mode / Connectors): MCP-Server-URL <code>{{MCP_URL}}</code> hinzufügen und einloggen - keine Advanced-OAuth-Einstellungen nötig.</li>
-            <li>Responses API: <code>tools:[{type:"mcp", server_url:"{{MCP_URL}}"}]</code> mit Authorization.</li>
+            <li>ChatGPT (Developer mode / Connectors): add the MCP server URL <code>{{MCP_URL}}</code> and sign in - no advanced OAuth settings needed.</li>
+            <li>Responses API: <code>tools:[{type:"mcp", server_url:"{{MCP_URL}}"}]</code> with Authorization.</li>
           </ul>
         </details>
         <details>
           <summary>Gemini</summary>
           <ul>
-            <li>Gemini CLI: in <code>~/.gemini/settings.json</code> unter <code>mcpServers</code> mit
+            <li>Gemini CLI: in <code>~/.gemini/settings.json</code> under <code>mcpServers</code> with
               <code>httpUrl: "{{MCP_URL}}"</code>.</li>
-            <li>Gemini SDK: MCP-Server über den SDK-MCP-Support einbinden.</li>
+            <li>Gemini SDK: add the MCP server via the SDK's MCP support.</li>
           </ul>
         </details>
       </div>
       <div class="conn-card">
-        <h3>Verbindungsdaten</h3>
+        <h3>Connection details</h3>
         <div class="conn-row">
-          <span class="conn-label">MCP-Server-URL</span>
+          <span class="conn-label">MCP server URL</span>
           <code class="conn-val conn-emphasis" id="cv-url">{{MCP_URL}}</code>
-          <button class="copy-btn" type="button" data-copy="cv-url">Kopieren</button>
+          <button class="copy-btn" type="button" data-copy="cv-url">Copy</button>
         </div>
-        <p class="conn-note">Mehr braucht's nicht - der Client registriert sich automatisch (DCR/CIMD).</p>
+        <p class="conn-note">That's all you need - the client registers itself automatically (DCR/CIMD).</p>
         <details class="conn-manual">
-          <summary>Nur für manuelles Setup (Clients ohne automatische Registrierung)</summary>
+          <summary>Manual setup only (clients without automatic registration)</summary>
           <div class="conn-row">
-            <span class="conn-label">Client-ID</span>
+            <span class="conn-label">Client ID</span>
             <code class="conn-val" id="cv-cid">{{CLIENT_ID}}</code>
-            <button class="copy-btn" type="button" data-copy="cv-cid">Kopieren</button>
+            <button class="copy-btn" type="button" data-copy="cv-cid">Copy</button>
           </div>
           <div class="conn-row">
             <span class="conn-label">Issuer</span>
             <code class="conn-val" id="cv-iss">{{ISSUER}}</code>
-            <button class="copy-btn" type="button" data-copy="cv-iss">Kopieren</button>
+            <button class="copy-btn" type="button" data-copy="cv-iss">Copy</button>
           </div>
           <div class="conn-row">
             <span class="conn-label">Scopes</span>
@@ -74,12 +74,20 @@
     </section>
 
     <section class="skills">
-      <h2>Skills durchsuchen</h2>
+      <h2>Browse skills</h2>
       <input id="q" type="search" autocomplete="off"
-             placeholder="Suche nach Name, Zweck oder Beschreibung ...">
+             placeholder="Search by name, purpose, or description ...">
       <p id="count" class="count"></p>
       <div id="rows" class="rows" aria-live="polite"></div>
-      <p id="empty" class="empty" hidden>Keine Treffer.</p>
+      <p id="empty" class="empty" hidden>No matches.</p>
+    </section>
+
+    <section class="contribute">
+      <h2>Add a skill</h2>
+      <p>Want to add a new skill or agent? Open a pull request on
+        <a href="https://github.com/csr-hico/hico-skills">github.com/csr-hico/hico-skills</a> -
+        each one is a folder with a <code>SKILL.md</code> (or <code>AGENT.md</code>) and any
+        bundled scripts or templates.</p>
     </section>
   </main>
 
