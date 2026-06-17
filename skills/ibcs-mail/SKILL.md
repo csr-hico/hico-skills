@@ -1,175 +1,177 @@
 ---
 name: IBCS-Mail
 description: >
-  Verfasst deutsche (oder englische) Geschäfts-E-Mails im IBCS-Stil von Christoph Schmeisser
-  (Senior BI-Berater): pyramidal vom Überblick zum Detail, GROSSBUCHSTABEN-Überschriften,
-  lösungsorientiert ohne Dramatisierung, mit expliziten Datums-/Zeitangaben und klaren
-  Verantwortlichkeiten - als Outlook-tauglicher Klartext ohne Markdown.
+  Writes business emails in IBCS style: pyramidal from overview to detail, UPPERCASE headings,
+  solution-oriented without drama, with explicit dates/times and clear responsibilities - as
+  Outlook-ready plain text without Markdown. The email is written in the language of the user's
+  prompt.
 triggers:
+  - write an email
+  - draft an email
+  - improve this email
+  - email to the customer
   - schreib eine Mail
   - E-Mail aufsetzen
-  - Mail an den Kunden
-  - Mail-Entwurf
-  - improve this email
-  - draft an email
 ---
 
-# IBCS-Mail (Stilanweisung Christoph Schmeisser)
+# IBCS-Mail
 
-Schreibe eine Geschäfts-E-Mail im IBCS-Stil. Frage fehlenden Kontext (Empfänger, Anliegen, Fakten,
-gewünschte nächste Schritte) kurz nach, statt Details zu erfinden. Gib am Ende **nur die fertige
-Mail als Klartext** aus (siehe FORMATIERUNG) - keine Erklärung drumherum, außer der Nutzer bittet darum.
+Write a business email in IBCS style. Ask briefly for any missing context (recipient, request,
+facts, desired next steps) instead of inventing details. Output **only the finished email as plain
+text** (see FORMATTING) - no commentary around it, unless the user asks for it.
 
-## Grundhaltung
-- Professionell-lösungsorientiert: Fokus auf Lösungen, auch bei Problemen.
-- Proaktiv: Eigeninitiative und nächste Schritte klar benennen.
-- Positiv formuliert: keine negativen/dramatisierenden Ausdrücke, stattdessen konstruktive Alternativen.
-- Kundenfreundlich: Beziehungspflege, keine Schuldzuweisungen.
-- Transparent: Ursachen und Maßnahmen klar benennen, ohne Beschönigung, ohne Dramatisierung.
+**Language:** write the email in the **language of the user's prompt**. If the user writes the
+request in German, write a German email; if in English, English; and so on. Translate the headings
+and labels below into that language - but keep them UPPERCASE. The examples here are in English.
 
-## IBCS-Struktur (vom Groben zum Detail)
-1. Überblick/Zusammenfassung zuerst.
-2. Detaillierte Ausführung in thematischen Blöcken.
-3. Konkrete nächste Schritte am Ende.
-4. Redundanzen vermeiden.
-5. Datumsangaben IMMER explizit: nicht "Freitag", sondern "Freitag, 21.10.2025" (der Empfänger
-   liest evtl. später).
-6. Uhrzeiten als "hh:mm Uhr" (Zeitpunkt) bzw. "hh:mm-hh:mm Uhr" (Zeitraum). Auf Englisch zusätzlich
-   die Zeitzone nennen (z. B. CEST).
+## Mindset
+- Professional and solution-oriented: focus on solutions, even for problems.
+- Proactive: state initiative and the next steps clearly.
+- Phrased positively: avoid negative or dramatizing wording; offer constructive alternatives.
+- Customer-friendly: tend the relationship, no blame.
+- Transparent: name causes and measures clearly - no glossing over, no dramatizing.
 
-## Aufbau
-**Anrede** - Einzelperson: `Hallo Herr/Frau [Nachname],` · Gruppe: `Hallo zusammen,` /
-`Hallo miteinander,`. Immer mit Komma.
+## IBCS structure (general to specific)
+1. Overview/summary first.
+2. Detailed exposition in thematic blocks.
+3. Concrete next steps at the end.
+4. Avoid redundancy.
+5. Dates ALWAYS explicit: not "Friday", but "Friday, 21 Oct 2025" (the recipient may read it later).
+6. Times as "hh:mm" (point in time) or "hh:mm-hh:mm" (range). Include the time zone when relevant
+   (e.g. CEST).
 
-**Einleitung** - 1-3 Sätze, gibt Kontext oder Kurz-Zusammenfassung.
+## Structure
+**Salutation** - individual: `Hello Mr/Ms [last name],` · group: `Hello everyone,`. Always a comma.
 
-**Hauptteil in thematischen Blöcken**
-- Überschriften IMMER in GROSSBUCHSTABEN, prägnant, danach IMMER ein Zeilenumbruch (nie in derselben
-  Zeile weiterschreiben).
-- Blöcke vom Allgemeinen zum Spezifischen, kurze bis mittellange Sätze.
-- Aufzählungen mit `-` (Bindestrich), Unterpunkte mit Tab eingerückt.
-- Zeitangaben in Klammern, z. B. "(17.10.2025)", "(Ende Juli 2025)".
-- Technische Details präzise: Tausender mit Punkt ("10.384 MB"), Versionen vollständig
-  ("31.34.8.0 (November 2024)"), Servernamen vollständig ("DEGRV-APP-PV017"), Dateinamen in
-  Anführungszeichen ("Server Sizing_BL.pdf").
+**Opening** - 1-3 sentences giving context or a short summary.
 
-**Nächste Schritte** - Überschrift NÄCHSTE SCHRITTE (dt.) bzw. NEXT STEPS (engl.), nummerierte Liste
-mit Verantwortlichkeit als Präfix:
+**Body in thematic blocks**
+- Headings ALWAYS in UPPERCASE, concise, followed ALWAYS by a line break (never continue on the
+  same line).
+- Move from general to specific; short to medium sentences.
+- Lists with `-`, sub-points indented with a tab.
+- Dates in parentheses, e.g. "(17 Oct 2025)", "(end of July 2025)".
+- Technical details precise: thousands separators ("10,384 MB"), full versions
+  ("31.34.8.0 (November 2024)"), full server names ("DEGRV-APP-PV017"), file names in quotes
+  ("Server Sizing_BL.pdf").
+
+**Next steps** - heading NEXT STEPS, a numbered list with the responsible party as a prefix:
 ```
-1.  KUNDE: Snapshot der VM ziehen bis morgen (14.10.2025) 09:30 Uhr.
-2.  HICO: Backup ziehen, neu installieren, Backup zurückspielen.
+1.  CUSTOMER: Take a VM snapshot by tomorrow (14 Oct 2025) 09:30.
+2.  HICO: Back up, reinstall, restore the backup.
 ```
-Zuständigkeiten explizit zuordnen ("HICO:", "KUNDE:", "KUNDE & HICO:").
+Assign responsibilities explicitly ("HICO:", "CUSTOMER:", "CUSTOMER & HICO:").
 
-**Abschluss** - optionales Hilfsangebot bei komplexen Themen + kurze Rückfrage
-("Hilft Ihnen das weiter?" / "Gebt mir einfach Bescheid, wann wir das einplanen wollen!").
-Leerzeile vor der Grußformel.
+**Closing** - optional offer to help on complex topics + a short check-back
+("Does this help?" / "Just let me know when you'd like to schedule this!").
+Blank line before the sign-off.
 
-**Grußformel** - `Viele Grüße,` oder `Beste Grüße,` + neue Zeile `Christoph Schmeisser`.
+**Sign-off** - `Best regards,` or `Kind regards,` on its own line, then `[Your name]`.
 
-## Sprache (Beispiele)
-- statt "Das Problem ist..." → "Die Ursache haben wir gefunden:"
-- statt "Leider ist die Datenbank voll" → "Eure Datenbank hat das maximale Größenlimit erreicht"
-- statt "Das geht nicht" → "Um das dauerhaft zu lösen, benötigt es folgende Schritte:"
-- Bei Problemen: erst Situation beschreiben, dann Lösung; Sofortmaßnahme + langfristige Lösung.
-- Höflich ohne Übertreibung ("verzeihen Sie bitte die späte Antwort", "vielen Dank für das
-  konstruktive Meeting").
+## Language (examples)
+- instead of "The problem is..." → "We found the cause:"
+- instead of "Unfortunately the database is full" → "Your database has reached its size limit"
+- instead of "That's not possible" → "To solve this permanently, the following steps are needed:"
+- For problems: describe the situation first, then the solution; immediate measure + long-term fix.
+- Polite without overdoing it ("apologies for the late reply", "thank you for the constructive
+  meeting").
 
-## Vermeiden
-Übermäßige Fettschrift/Hervorhebungen · negative oder dramatisierende Sprache · Schuldzuweisungen ·
-lange verschachtelte Sätze · informelle/emotionale Ausdrücke · übertriebene Entschuldigungen.
+## Avoid
+Excessive bold/highlighting · negative or dramatizing language · blame · long nested sentences ·
+informal/emotional phrasing · over-apologizing.
 
-## Formatierung (MS Outlook)
-- KEIN Markdown (kein `#`, `**`, `-`-als-Markdown etc.). Reiner Text.
-- Überschriften: schlicht in GROSSBUCHSTABEN, kein Styling.
-- Leerzeilen zwischen allen Abschnitten.
-- Aufzählungen: einfacher Bindestrich `-` oder Nummerierung `1.`, `2.`; Unterpunkte mit Tab.
+## Formatting (MS Outlook)
+- NO Markdown (no `#`, `**`, etc.). Plain text only.
+- Headings: simply UPPERCASE, no styling.
+- Blank lines between all sections.
+- Lists: a simple hyphen `-` or numbering `1.`, `2.`; sub-points with a tab.
 
-## Mail-Typen (Skelette)
+## Mail types (skeletons)
 
-VERWENDE das passende Skelett, nicht alle. Überschriften nach Bedarf anpassen.
+USE the fitting skeleton, not all of them. Adapt the headings as needed and translate them into the
+email's language.
 
-### 1. Problem-/Fehlermeldung
+### 1. Problem/incident report
 ```
-<Anrede>
+<Salutation>
 
-<Kurze Zusammenfassung: Was ist das Problem?>
+<Short summary: what is the problem?>
 
-FEHLERBILD UND URSACHE
-<Technische Details, präzise aber verständlich>
+ISSUE AND CAUSE
+<Technical details, precise but understandable>
 
-SOFORTMASSNAHME
-<Was wurde bereits getan?>
+IMMEDIATE MEASURE
+<What has already been done?>
 
-NÄCHSTE SCHRITTE
-<Nummerierte Liste mit Verantwortlichkeiten>
+NEXT STEPS
+<Numbered list with responsibilities>
 
-<Hilfsangebot>
+<Offer to help>
 
-Beste Grüße,
-Christoph Schmeisser
-```
-
-### 2. Meeting-Zusammenfassung
-```
-<Anrede>
-
-<Dank für das Meeting + Ankündigung der Zusammenfassung>
-
-POSITIVES FEEDBACK
-<Was lief gut?>
-
-DISKUSSIONSPUNKTE [THEMA]
-- Punkt 1
-- Punkt 2
-
-[WEITERE THEMEN]
-<Weitere Diskussionspunkte>
-
-NÄCHSTE SCHRITTE
-1.  [ZUSTÄNDIGKEIT]: [Aktion]
-2.  [ZUSTÄNDIGKEIT]: [Aktion]
-
-Beste Grüße,
-Christoph Schmeisser
+Best regards,
+[Your name]
 ```
 
-### 3. Status-Update
+### 2. Meeting summary
 ```
-<Anrede>
+<Salutation>
 
-<Kurze Statusbeschreibung>
+<Thanks for the meeting + announce the summary>
+
+POSITIVE FEEDBACK
+<What went well?>
+
+DISCUSSION POINTS [TOPIC]
+- Point 1
+- Point 2
+
+[FURTHER TOPICS]
+<More discussion points>
+
+NEXT STEPS
+1.  [RESPONSIBILITY]: [action]
+2.  [RESPONSIBILITY]: [action]
+
+Best regards,
+[Your name]
+```
+
+### 3. Status update
+```
+<Salutation>
+
+<Short status description>
 
 Problem:
-<Präzise Fehlerbeschreibung>
+<Precise description>
 
-Server: <Name>
-Version: <Version>
+Server: <name>
+Version: <version>
 
-Ursache: <Technische Ursache>
+Cause: <technical cause>
 
 NEXT STEPS:
-1.  [ZUSTÄNDIGKEIT]: [Aktion] [Zeitrahmen]
-2.  [ZUSTÄNDIGKEIT]: [Aktion]
+1.  [RESPONSIBILITY]: [action] [timeframe]
+2.  [RESPONSIBILITY]: [action]
 
-Beste Grüße,
-Christoph Schmeisser
+Best regards,
+[Your name]
 ```
 
-### 4. Anfrage/Information
+### 4. Request/information
 ```
-<Anrede>
+<Salutation>
 
-<Optionale Einleitung>
+<Optional opening>
 
-ÜBERSCHRIFT 1
-<Information/Erklärung>
+HEADING 1
+<Information/explanation>
 
-ÜBERSCHRIFT 2
-<Weitere Information>
+HEADING 2
+<More information>
 
-<Rückfrage, ob es weiterhilft>
+<Check-back whether it helps>
 
-Beste Grüße,
-Christoph Schmeisser
+Best regards,
+[Your name]
 ```
