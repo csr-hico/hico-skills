@@ -56,3 +56,10 @@ def test_index_injects_brand_color(client):
     r = client.get("/")
     assert r.status_code == 200
     assert "--brand-orange" in r.text
+
+
+def test_index_shows_build_version(client):
+    r = client.get("/")
+    assert "Version:" in r.text
+    assert "{{VERSION}}" not in r.text  # placeholder was substituted
+    assert "dev" in r.text  # default GIT_SHA when not injected at build

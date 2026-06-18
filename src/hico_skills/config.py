@@ -8,9 +8,13 @@ from __future__ import annotations
 
 import os
 from dataclasses import dataclass
+from datetime import datetime, timezone
 from pathlib import Path
 
 _REPO_ROOT = Path(__file__).resolve().parents[2]
+
+# Process start time; used as the build/deploy timestamp when BUILD_TIME isn't injected.
+_STARTED_AT = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M UTC")
 
 
 @dataclass(frozen=True)
@@ -34,10 +38,19 @@ class Settings:
     brand_orange: str
     brand_blue: str
     bg: str
+    # Build identity (GIT_SHA injected at build from Coolify's SOURCE_COMMIT; BUILD_TIME optional):
+    git_sha: str
+    build_time: str
 
     @property
     def auth_enabled(self) -> bool:
         return bool(self.oidc_issuer)
+
+    @property
+    def version_label(self) -> str:
+        """Short commit + timestamp for the OnePager footer, e.g. `abcdef2, 2026-06-18 09:30 UTC`."""
+        sha = (self.git_sha or "dev")[:7]
+        return f"{sha}, {self.build_time}" if self.build_time else sha
 
     @property
     def mcp_url(self) -> str:
@@ -81,4 +94,6 @@ def load_settings(env: dict[str, str] | None = None) -> Settings:
         brand_orange=e.get("BRAND_ORANGE", "#FF5F2C").strip(),
         brand_blue=e.get("BRAND_BLUE", "#2C53AB").strip(),
         bg=e.get("BG", "#FFFFFF").strip(),
+        git_sha=e.get("GIT_SHA", "").strip() or "dev",
+        build_time=e.get("BUILD_TIME", "").strip() or _STARTED_AT,
     )

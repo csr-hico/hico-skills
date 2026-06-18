@@ -28,4 +28,5 @@ def render_index(html: str, settings: Settings) -> str:
     out = out.replace("{{MCP_URL}}", settings.mcp_url or _UNSET)
     out = out.replace("{{ISSUER}}", settings.oidc_issuer or _UNSET)
     out = out.replace("{{CLIENT_ID}}", settings.oidc_client_id or _UNSET)
+    out = out.replace("{{VERSION}}", settings.version_label)
     return out
