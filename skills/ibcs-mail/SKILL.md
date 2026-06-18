@@ -3,8 +3,9 @@ name: IBCS-Mail
 description: >
   Writes business emails in IBCS style: pyramidal from overview to detail, UPPERCASE headings,
   solution-oriented without drama, with explicit dates/times and clear responsibilities - as
-  Outlook-ready plain text without Markdown. The email is written in the language of the user's
-  prompt.
+  Outlook-ready plain text without Markdown. The reply is ONLY the email, returned in a single
+  copyable block - no preamble, no closing comments. The email is written in the language of the
+  user's prompt.
 triggers:
   - write an email
   - draft an email
@@ -17,8 +18,20 @@ triggers:
 # IBCS-Mail
 
 Write a business email in IBCS style. Ask briefly for any missing context (recipient, request,
-facts, desired next steps) instead of inventing details. Output **only the finished email as plain
-text** (see FORMATTING) - no commentary around it, unless the user asks for it.
+facts, desired next steps) instead of inventing details.
+
+## Output contract (STRICT)
+Your reply is the email and nothing else:
+- **No preamble** - do not write "Here is your email:", "Sure,", or any lead-in.
+- **No trailing comments** - no notes, explanations, options, or sign-off from you after the email.
+- Put the **entire email inside ONE fenced code block** (```), salutation through sign-off, so the
+  whole message is copyable in a single click. Nothing outside the block.
+- The fence is only a wrapper - the email text inside stays plain (no Markdown, see FORMATTING);
+  copying the block yields clean Outlook-ready text without the backticks.
+- Only if the user **explicitly** asks for an explanation or alternatives, put them AFTER the code
+  block, never inside it.
+- If context is missing, ask your clarifying question(s) first; once answered, reply with just the
+  email block.
 
 **Language:** write the email in the **language of the user's prompt**. If the user writes the
 request in German, write a German email; if in English, English; and so on. Translate the headings
@@ -81,7 +94,9 @@ Excessive bold/highlighting · negative or dramatizing language · blame · long
 informal/emotional phrasing · over-apologizing.
 
 ## Formatting (MS Outlook)
-- NO Markdown (no `#`, `**`, etc.). Plain text only.
+- Wrap the whole email in ONE fenced code block so it is copyable in a single click (see the
+  Output contract). The fence is the only "markup" allowed; everything inside is plain text.
+- NO Markdown (no `#`, `**`, etc.) inside the email. Plain text only.
 - Headings: simply UPPERCASE, no styling.
 - Blank lines between all sections.
 - Lists: a simple hyphen `-` or numbering `1.`, `2.`; sub-points with a tab.
