@@ -13,6 +13,14 @@ services:
       - web
     env_file:
       - .env
+    # The OAuth proxy persists DCR client registrations (and issued tokens) in an encrypted
+    # file store under $FASTMCP_HOME. Without a volume that store lives in the container's
+    # ephemeral fs and is wiped on every rebuild/redeploy, so clients (OpenAI/Claude) that
+    # cached a client_id get "Client Not Registered" on reconnect. Keep it on a named volume.
+    environment:
+      - FASTMCP_HOME=/data/fastmcp
+    volumes:
+      - oauth-state:/data
     healthcheck:
       test: ["CMD-SHELL", "python -c \"import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/healthz', timeout=3)\""]
       interval: 30s
@@ -45,3 +53,6 @@ networks:
   default: {}
   web:
     external: true
+
+volumes:
+  oauth-state: {}

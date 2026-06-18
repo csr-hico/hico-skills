@@ -33,6 +33,14 @@ via `@mcp.custom_route`, the web OnePager + a small JSON API.
   requires the `groups` claim to contain `MCP_REQUIRED_GROUP`. It is NOT behind forward-auth (that
   would return an HTML login page to an MCP client).
 
+> **DCR persistence.** `OAuthProxy` presents Dynamic Client Registration to MCP clients and stores
+> each registration (plus issued tokens) in an encrypted file store under `$FASTMCP_HOME`
+> (`/data/fastmcp`, on the `oauth-state` volume). This MUST stay on a volume: otherwise a rebuild
+> or restart wipes it and previously-registered clients fail reconnect with "Client Not Registered".
+> The store's encryption key derives from the upstream Authentik client secret, so rotating that
+> secret invalidates existing registrations (clients just re-register; decryption errors are treated
+> as cache misses, not crashes).
+
 ## Data flow
 
 Skills/agents are folders baked into the image (`skills/<id>/SKILL.md`, `agents/<id>/AGENT.md`,
