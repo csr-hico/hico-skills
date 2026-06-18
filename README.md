@@ -79,3 +79,19 @@ and the project plan for the full provisioning sequence.
 | `PUBLIC_BASE_URL` | used to render the `/mcp` URL in the connect docs |
 | `BRAND_ORANGE` / `BRAND_BLUE` / `BG` | OnePager colors |
 | `SKILLS_DIR` / `AGENTS_DIR` / `FRONTEND_DIR` / `HOST` / `PORT` | paths and bind address |
+
+## License
+
+This project is **source-available, not open source**. It uses split licensing:
+
+- **Software** (`src/`, `frontend/`, `tests/`, packaging) - **PolyForm Noncommercial 1.0.0**
+  (`LICENSE.md`). You may clone, run, modify, and redistribute it for **noncommercial**
+  purposes. Any commercial use requires a separate license (see below).
+- **Bundled skills and agents** (`skills/`, `agents/`) - **proprietary, all rights reserved**
+  (`skills/LICENSE.md`, `agents/LICENSE.md`). They ship only as examples and **may not be
+  reused, redistributed, or deployed**; replace them with your own content.
+
+### Commercial licensing
+
+Commercial use of the software - and any use of the bundled skills/agents - requires a paid
+license from the copyright holder. Contact: **<INSERT COMMERCIAL CONTACT EMAIL>**.
