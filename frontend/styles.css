@@ -158,3 +158,8 @@ footer {
   padding: 1.5rem;
   border-top: 1px solid var(--border);
 }
+
+footer .version {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  opacity: 0.8;
+}

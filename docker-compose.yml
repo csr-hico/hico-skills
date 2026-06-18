@@ -5,7 +5,11 @@
 #   - everything else     : the web OnePager behind Authentik forward-auth (authentik@file).
 services:
   hico-skills:
-    build: .
+    build:
+      context: .
+      args:
+        # Coolify exposes the deployed commit as SOURCE_COMMIT; baked into the footer version.
+        GIT_SHA: ${SOURCE_COMMIT:-dev}
     container_name: hico-skills
     restart: unless-stopped
     networks:

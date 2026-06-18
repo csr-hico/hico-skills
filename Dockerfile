@@ -13,11 +13,16 @@ COPY frontend ./frontend
 COPY skills ./skills
 COPY agents ./agents
 
+# Commit currently being built, shown in the OnePager footer. Coolify passes the deployed
+# commit as the SOURCE_COMMIT build arg (see docker-compose.yml); falls back to "dev" locally.
+ARG GIT_SHA=dev
+
 ENV SKILLS_DIR=/app/skills \
     AGENTS_DIR=/app/agents \
     FRONTEND_DIR=/app/frontend \
     HOST=0.0.0.0 \
-    PORT=8000
+    PORT=8000 \
+    GIT_SHA=${GIT_SHA}
 
 EXPOSE 8000
 
