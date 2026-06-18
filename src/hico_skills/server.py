@@ -10,6 +10,7 @@ All config comes from env/Settings - nothing infra-revealing is hardcoded.
 from __future__ import annotations
 
 import base64
+import logging
 import mimetypes
 
 from fastmcp import FastMCP
@@ -24,6 +25,8 @@ from .guidance import GUIDE_URI, discovery_text
 from .models import AGENT
 from .search import search as core_search
 from .store import SkillStore
+
+logger = logging.getLogger("hico_skills.search")
 
 
 def require_group(group: str) -> AuthCheck:
@@ -90,9 +93,21 @@ def register_tools(mcp: FastMCP, settings: Settings, store: SkillStore) -> None:
         """
         store.maybe_reload()
         hits = core_search(store.all(), query, type)
-        return [
+        result = [
             {"id": h.id, "type": h.type, "name": h.name, "when_to_use": h.when_to_use} for h in hits
         ]
+        # Telemetry trip-wire: when hits and payload size grow, it's time to revisit ranking /
+        # consider embeddings (see search.py header + docs). approx tokens ~= chars / 4.
+        payload_chars = sum(len(h["name"]) + len(h["when_to_use"]) for h in result)
+        logger.info(
+            "search query=%r type=%s hits=%d approx_tokens=%d corpus=%d",
+            query,
+            type,
+            len(result),
+            payload_chars // 4,
+            len(store.all()),
+        )
+        return result
 
     @mcp.tool(auth=group_check)
     def get(id: str) -> str:
