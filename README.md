@@ -21,7 +21,7 @@ values are rendered on the OnePager only, behind login.
 python -m venv .venv && source .venv/bin/activate
 pip install -e ".[dev]"
 pytest -q                       # all green is the merge gate
-MCP_REQUIRED_GROUP="" python -m hico_skills   # auth off for local; serves on :8000
+python -m hico_skills           # auth off for local (no ENTRA_TENANT_ID); serves on :8000
 ```
 
 Then open <http://127.0.0.1:8000/> and hit `http://127.0.0.1:8000/mcp` with an MCP client.
@@ -66,16 +66,19 @@ docs/              ARCHITECTURE.md, CONNECT.md
 
 ## Deploy
 
-Coolify (Raw-Compose) behind Traefik + Authentik. Brand colors are configurable via
-`BRAND_ORANGE` / `BRAND_BLUE` / `BG` (env) or the CSS `:root` defaults. See `docs/ARCHITECTURE.md`
-and the project plan for the full provisioning sequence.
+Coolify (Raw-Compose) behind Traefik. Auth is direct **Microsoft Entra ID**: the `/mcp`
+resource server validates Entra JWTs itself, the web OnePager sits behind an oauth2-proxy
+sidecar (same Entra app). Brand colors are configurable via `BRAND_ORANGE` / `BRAND_BLUE` /
+`BG` (env) or the CSS `:root` defaults. See `docs/ARCHITECTURE.md` and the project plan for
+the full provisioning sequence.
 
 ## Config (env)
 
 | Var | Purpose |
 |-----|---------|
-| `OIDC_ISSUER` / `OIDC_JWKS_URI` / `OIDC_AUDIENCE` / `OIDC_CLIENT_ID` | OIDC resource-server validation for `/mcp` (empty issuer = auth disabled, for local dev) |
-| `MCP_REQUIRED_GROUP` | group the JWT `groups` claim must contain |
+| `ENTRA_TENANT_ID` / `OIDC_CLIENT_ID` / `OIDC_CLIENT_SECRET` | Entra app registration used for `/mcp` token validation AND the web login (empty tenant = auth disabled, for local dev) |
+| `MCP_SCOPE` | custom API scope name under "Expose an API" (default `mcp.access`) |
+| `OAUTH2_PROXY_COOKIE_SECRET` | 32-byte base64 session-cookie key for the oauth2-proxy sidecar |
 | `PUBLIC_BASE_URL` | used to render the `/mcp` URL in the connect docs |
 | `BRAND_ORANGE` / `BRAND_BLUE` / `BG` | OnePager colors |
 | `SKILLS_DIR` / `AGENTS_DIR` / `FRONTEND_DIR` / `HOST` / `PORT` | paths and bind address |

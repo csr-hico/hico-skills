@@ -29,16 +29,16 @@ def test_api_skills_shape_includes_description(client):
     assert beta["resources"] == ["scripts/run.py", "templates/out.txt"]
 
 
-def test_api_me_reads_forward_auth_headers(client):
+def test_api_me_reads_oauth2_proxy_headers(client):
     r = client.get(
         "/api/me",
         headers={
-            "X-authentik-username": "jdoe",
-            "X-authentik-name": "Jane Doe",
-            "X-authentik-groups": "HICO,dev",
+            "X-Forwarded-Preferred-Username": "jdoe@hico.test",
+            "X-Forwarded-Email": "jdoe@hico.test",
+            "X-Forwarded-Groups": "HICO,dev",
         },
     )
-    assert r.json() == {"username": "jdoe", "name": "Jane Doe", "groups": ["HICO", "dev"]}
+    assert r.json() == {"username": "jdoe@hico.test", "name": None, "groups": ["HICO", "dev"]}
 
 
 def test_api_me_anonymous(client):

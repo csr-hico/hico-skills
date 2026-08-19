@@ -2,7 +2,7 @@
 
 Routes are registered via @mcp.custom_route on the FastMCP instance so they share one process
 with /mcp. custom_route handlers are NOT wrapped by MCP auth - the web surface is gated upstream
-by Authentik forward-auth (Traefik), and /healthz must stay open for the Docker healthcheck.
+by oauth2-proxy (direct Entra ID login), and /healthz must stay open for the Docker healthcheck.
 """
 
 from __future__ import annotations

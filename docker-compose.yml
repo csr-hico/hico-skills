@@ -1,8 +1,9 @@
 # Coolify Raw-Compose. Host comes from ${APP_DOMAIN} (a Coolify env var) so the shared repo
-# never names the hosting. Two routers on one service:
-#   - /mcp + /.well-known : OIDC resource-server, NO forward-auth middleware (it returns its own
-#                           401 + WWW-Authenticate so MCP clients can run the OAuth flow).
-#   - everything else     : the web OnePager behind Authentik forward-auth (authentik@file).
+# never names the hosting. Two routers, two services:
+#   - /mcp + /.well-known + OAuth paths -> hico-skills directly. OIDC resource-server, NO auth
+#     middleware (it returns its own 401 + WWW-Authenticate so MCP clients can run the flow).
+#   - everything else -> oauth2-proxy (Entra ID login), which reverse-proxies the web OnePager
+#     and injects the X-Forwarded-* identity headers (client-supplied ones are stripped).
 services:
   hico-skills:
     build:
@@ -39,19 +40,62 @@ services:
       - "traefik.enable=true"
       - "traefik.docker.network=web"
       - "traefik.http.services.hico-skills.loadbalancer.server.port=8000"
-      # Router 1: /mcp + /.well-known, NO auth middleware, higher priority
+      # Router 1: /mcp + OAuth surface, NO auth middleware, higher priority
       - "traefik.http.routers.hico-skills-mcp.entrypoints=websecure"
       - "traefik.http.routers.hico-skills-mcp.rule=Host(`${APP_DOMAIN}`) && (PathPrefix(`/mcp`) || PathPrefix(`/.well-known`) || PathPrefix(`/authorize`) || PathPrefix(`/token`) || PathPrefix(`/register`) || PathPrefix(`/auth`) || PathPrefix(`/consent`))"
       - "traefik.http.routers.hico-skills-mcp.priority=100"
       - "traefik.http.routers.hico-skills-mcp.service=hico-skills"
       - "traefik.http.routers.hico-skills-mcp.tls.certResolver=leresolver"
-      # Router 2: catch-all web UI, forward-auth, lower priority
+
+  oauth2-proxy:
+    # Gates the web OnePager with a direct Entra ID login (no Authentik middleman).
+    # Reverse-proxy mode: unauthenticated requests 302 straight to Entra
+    # (skip_provider_button), authenticated ones are proxied to hico-skills with
+    # X-Forwarded-User/-Email/-Preferred-Username/-Groups set (pass_user_headers
+    # default; client-supplied copies are stripped, so the app can trust them).
+    image: quay.io/oauth2-proxy/oauth2-proxy:v7.15.3
+    container_name: hico-skills-oauth2-proxy
+    restart: unless-stopped
+    depends_on:
+      hico-skills:
+        condition: service_healthy
+    networks:
+      - default
+      - web
+    environment:
+      OAUTH2_PROXY_PROVIDER: entra-id
+      OAUTH2_PROXY_OIDC_ISSUER_URL: https://login.microsoftonline.com/${ENTRA_TENANT_ID}/v2.0
+      OAUTH2_PROXY_CLIENT_ID: ${OIDC_CLIENT_ID}
+      OAUTH2_PROXY_CLIENT_SECRET: ${OIDC_CLIENT_SECRET}
+      OAUTH2_PROXY_COOKIE_SECRET: ${OAUTH2_PROXY_COOKIE_SECRET}
+      OAUTH2_PROXY_REDIRECT_URL: https://${APP_DOMAIN}/oauth2/callback
+      OAUTH2_PROXY_UPSTREAMS: http://hico-skills:8000
+      OAUTH2_PROXY_HTTP_ADDRESS: 0.0.0.0:4180
+      OAUTH2_PROXY_REVERSE_PROXY: "true"
+      # Tenant membership is the gate (issuer is tenant-scoped + strictly verified),
+      # so no email-domain restriction on top.
+      OAUTH2_PROXY_EMAIL_DOMAINS: "*"
+      OAUTH2_PROXY_SCOPE: openid profile email
+      OAUTH2_PROXY_SKIP_PROVIDER_BUTTON: "true"
+    labels:
+      - "coolify.managed=true"
+      - "coolify.applicationId=${COOLIFY_APP_ID}"
+      - "coolify.type=application"
+      - "coolify.name=hico-skills-oauth2-proxy"
+      - "traefik.enable=true"
+      - "traefik.docker.network=web"
+      - "traefik.http.services.hico-skills-oauth2-proxy.loadbalancer.server.port=4180"
+      # Distroless image -> no in-container healthcheck possible; let Traefik probe the
+      # unauthenticated /ping endpoint instead.
+      - "traefik.http.services.hico-skills-oauth2-proxy.loadbalancer.healthcheck.path=/ping"
+      - "traefik.http.services.hico-skills-oauth2-proxy.loadbalancer.healthcheck.interval=10s"
+      - "traefik.http.services.hico-skills-oauth2-proxy.loadbalancer.healthcheck.timeout=3s"
+      # Router 2: catch-all web UI (incl. /oauth2/* login endpoints), lower priority
       - "traefik.http.routers.hico-skills-web.entrypoints=websecure"
       - "traefik.http.routers.hico-skills-web.rule=Host(`${APP_DOMAIN}`)"
       - "traefik.http.routers.hico-skills-web.priority=1"
-      - "traefik.http.routers.hico-skills-web.service=hico-skills"
+      - "traefik.http.routers.hico-skills-web.service=hico-skills-oauth2-proxy"
       - "traefik.http.routers.hico-skills-web.tls.certResolver=leresolver"
-      - "traefik.http.routers.hico-skills-web.middlewares=authentik@file"
 
 networks:
   default: {}

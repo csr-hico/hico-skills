@@ -1,7 +1,7 @@
 """Smoke test: the MCP tools work end-to-end via the in-process FastMCP client.
 
 This also catches FastMCP wiring/lifespan regressions without spinning up an HTTP server.
-Auth is disabled in the test settings (no OIDC_ISSUER), so the tools are callable.
+Auth is disabled in the test settings (no ENTRA_TENANT_ID), so the tools are callable.
 """
 
 from __future__ import annotations

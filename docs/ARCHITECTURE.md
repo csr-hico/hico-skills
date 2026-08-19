@@ -1,7 +1,8 @@
 # Architecture
 
-One Python process, one container. FastMCP (on Starlette) serves the MCP endpoint at `/mcp` and,
-via `@mcp.custom_route`, the web OnePager + a small JSON API.
+One Python process plus an oauth2-proxy sidecar, one compose stack. FastMCP (on Starlette)
+serves the MCP endpoint at `/mcp` and, via `@mcp.custom_route`, the web OnePager + a small
+JSON API. oauth2-proxy gates the web surface with a direct Entra ID login.
 
 ## Layers
 
@@ -14,32 +15,43 @@ via `@mcp.custom_route`, the web OnePager + a small JSON API.
   - `search.py` - substring/token ranking (no vector DB in v1).
   - `get.py` - render the full definition; agents get a spawn-as-subtask directive, and bundled
     files are listed in a trailing "Bundled files" section.
-  - `auth.py` - parse forward-auth headers; the web gating decision.
+  - `auth.py` - parse the oauth2-proxy identity headers for the web badge.
   - `config.py` - env -> immutable `Settings` (nothing infra-revealing is hardcoded).
   - `render.py` - inject brand colors + connect placeholders into the OnePager.
 - **Adapters** (thin):
-  - `server.py` - the `search`/`get`/`get_resource` MCP tools, bundled files as group-gated
+  - `server.py` - the `search`/`get`/`get_resource` MCP tools, bundled files as
     `FileResource`s, + the OIDC resource-server auth for `/mcp`.
   - `web.py` - the `/`, `/api/skills`, `/api/me`, `/healthz`, `/static/*` routes + app assembly.
 
-## Two auth surfaces (both Authentik, both gated to one group)
+## Two auth surfaces (both direct Entra ID, no Authentik middleman)
 
-- **Web UI** (`/`, `/api/*`): behind Authentik **forward-auth** (Traefik `authentik@file`). The
-  badge is read from `X-authentik-username` / `X-authentik-groups`, trustworthy only behind the
-  outpost.
-- **`/mcp`**: a full **OIDC OAuth 2.1 resource server**. `RemoteAuthProvider` + `JWTVerifier`
-  validate the bearer JWT (signature / issuer / audience) against Authentik's JWKS and emit
-  `401 + WWW-Authenticate` + protected-resource-metadata. A per-tool `AuthCheck` additionally
-  requires the `groups` claim to contain `MCP_REQUIRED_GROUP`. It is NOT behind forward-auth (that
-  would return an HTML login page to an MCP client).
+Both use the SAME pre-registered Entra app registration the old Authentik federation used.
+Tenant membership is the gate: a valid login against the HICO tenant grants access (under
+Authentik every hico-entra login was auto-added to the required group anyway, so this is the
+same effective policy with one hop less).
 
-> **DCR persistence.** `OAuthProxy` presents Dynamic Client Registration to MCP clients and stores
-> each registration (plus issued tokens) in an encrypted file store under `$FASTMCP_HOME`
-> (`/data/fastmcp`, on the `oauth-state` volume). This MUST stay on a volume: otherwise a rebuild
-> or restart wipes it and previously-registered clients fail reconnect with "Client Not Registered".
-> The store's encryption key derives from the upstream Authentik client secret, so rotating that
-> secret invalidates existing registrations (clients just re-register; decryption errors are treated
-> as cache misses, not crashes).
+- **Web UI** (`/`, `/api/*`): behind an **oauth2-proxy** sidecar in reverse-proxy mode
+  (`provider=entra-id`, tenant-scoped issuer, strictly verified). The badge is read from
+  `X-Forwarded-Preferred-Username` / `X-Forwarded-Email` / `X-Forwarded-Groups`; oauth2-proxy
+  strips client-supplied copies before injecting its own, so they are trustworthy behind it.
+- **`/mcp`**: a full **OIDC OAuth 2.1 resource server**. FastMCP's `AzureProvider` validates the
+  bearer JWT (signature / issuer / audience / custom API scope `MCP_SCOPE`, default `mcp.access`)
+  against the tenant JWKS and emits `401 + WWW-Authenticate` + protected-resource-metadata. It is
+  NOT behind oauth2-proxy (that would return an HTML login page to an MCP client).
+
+Entra prerequisites on the app registration (already configured): redirect URIs
+`/auth/callback` (MCP) + `/oauth2/callback` (web), "Expose an API" with the `mcp.access` scope
+(admin-consented), and `requestedAccessTokenVersion: 2` in the manifest (v1 tokens would fail
+issuer validation). NOTE: Entra client secrets expire (max 24 months) - rotation is a
+recurring ops task; the old Authentik setup was a public client without a secret.
+
+> **DCR persistence.** `AzureProvider` (an `OAuthProxy`) presents Dynamic Client Registration to
+> MCP clients and stores each registration (plus issued tokens) in an encrypted file store under
+> `$FASTMCP_HOME` (`/data/fastmcp`, on the `oauth-state` volume). This MUST stay on a volume:
+> otherwise a rebuild or restart wipes it and previously-registered clients fail reconnect with
+> "Client Not Registered". The store's encryption key derives from the upstream client secret, so
+> rotating the Entra secret invalidates existing registrations (clients just re-register;
+> decryption errors are treated as cache misses, not crashes).
 
 ## Data flow
 

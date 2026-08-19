@@ -1,16 +1,17 @@
 # Connecting the MCP server
 
 The server is a remote MCP server over **Streamable HTTP**, gated by OIDC (OAuth 2.1 / PKCE)
-against Authentik. Access is limited to members of the configured group.
+directly against **Microsoft Entra ID**. Access is limited to members of the company tenant:
+sign in with your work account.
 
 > **You only need the MCP server URL** (`<MCP_URL>`). Clients (Claude, ChatGPT) register
 > themselves automatically via DCR/CIMD - no client id, secret, or endpoints to enter.
 >
 > The values below are only for a manual/fallback setup (a client that cannot self-register);
 > they are shown live on the OnePager behind login:
-> - `<ISSUER>` - the OIDC issuer for this app
-> - `<CLIENT_ID>` - the public client id
-> - Scopes: `openid profile groups`
+> - `<ISSUER>` - the Entra v2 issuer for the tenant
+> - `<CLIENT_ID>` - the app registration's client id
+> - Scopes: `mcp.access` (expands to `api://<CLIENT_ID>/mcp.access`)
 
 ## Claude
 
@@ -43,5 +44,6 @@ against Authentik. Access is limited to members of the configured group.
 
 ## One-time per client
 
-Because Authentik dynamic client registration is not relied upon, each client type needs its
-redirect URI registered once on the Authentik OIDC provider.
+Nothing. Entra has no dynamic client registration, but the server's built-in OAuth proxy
+registers clients itself (DCR/CIMD) and funnels every login through its single pre-registered
+redirect URI - no per-client changes on the Entra app registration.
