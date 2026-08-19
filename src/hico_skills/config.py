@@ -8,13 +8,13 @@ from __future__ import annotations
 
 import os
 from dataclasses import dataclass
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 
 _REPO_ROOT = Path(__file__).resolve().parents[2]
 
 # Process start time; used as the build/deploy timestamp when BUILD_TIME isn't injected.
-_STARTED_AT = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M UTC")
+_STARTED_AT = datetime.now(UTC).strftime("%Y-%m-%d %H:%M UTC")
 
 
 @dataclass(frozen=True)

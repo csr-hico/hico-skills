@@ -39,7 +39,7 @@ def _slug(name: str) -> str:
 
 
 def _hidden(name: str) -> bool:
-    return name.startswith("_") or name.startswith(".")
+    return name.startswith(("_", "."))
 
 
 class SkillStore:

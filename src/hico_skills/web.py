@@ -35,11 +35,11 @@ def register_routes(mcp: FastMCP, settings: Settings, store: SkillStore) -> None
     logo_png = (settings.frontend_dir / "hico-logo.png").read_bytes()
 
     @mcp.custom_route("/healthz", methods=["GET"])
-    async def healthz(request):  # noqa: ANN001
+    async def healthz(request):
         return PlainTextResponse("ok")
 
     @mcp.custom_route("/api/skills", methods=["GET"])
-    async def api_skills(request):  # noqa: ANN001
+    async def api_skills(request):
         store.maybe_reload()
         return JSONResponse(
             [
@@ -56,26 +56,26 @@ def register_routes(mcp: FastMCP, settings: Settings, store: SkillStore) -> None
         )
 
     @mcp.custom_route("/api/me", methods=["GET"])
-    async def api_me(request):  # noqa: ANN001
+    async def api_me(request):
         ident = identity_from_headers(request.headers)
         return JSONResponse(
             {"username": ident.username, "name": ident.name, "groups": list(ident.groups)}
         )
 
     @mcp.custom_route("/", methods=["GET"])
-    async def index(request):  # noqa: ANN001
+    async def index(request):
         return HTMLResponse(render_index(index_html, settings))
 
     @mcp.custom_route("/static/styles.css", methods=["GET"])
-    async def styles(request):  # noqa: ANN001
+    async def styles(request):
         return Response(styles_css, media_type="text/css")
 
     @mcp.custom_route("/static/app.js", methods=["GET"])
-    async def appjs(request):  # noqa: ANN001
+    async def appjs(request):
         return Response(app_js, media_type="application/javascript")
 
     @mcp.custom_route("/static/hico-logo.png", methods=["GET"])
-    async def logo(request):  # noqa: ANN001
+    async def logo(request):
         return Response(logo_png, media_type="image/png")
 
 

@@ -18,9 +18,11 @@ def _resources_section(skill: Skill) -> str:
     kind = "agents" if skill.type == AGENT else "skills"
     lines = [
         "\n\n---\n## Bundled files",
-        f"This {skill.type} ships the files below. Fetch any with the `get_resource` tool "
-        f'(`id="{skill.id}"`, `path="<path>"`) or read the MCP resource '
-        f"`file:///{kind}/{skill.id}/<path>`:",
+        (
+            f"This {skill.type} ships the files below. Fetch any with the `get_resource` tool "
+            f'(`id="{skill.id}"`, `path="<path>"`) or read the MCP resource '
+            f"`file:///{kind}/{skill.id}/<path>`:"
+        ),
     ]
     lines += [f"- `{rel}`" for rel in skill.resources]
     return "\n".join(lines)

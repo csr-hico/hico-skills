@@ -46,7 +46,7 @@ def test_bad_type_arg_raises():
 
 def test_no_frontmatter_raises_on_validation():
     # split is lenient ({}, text); skill_from_text rejects the missing name.
-    meta, body = split_frontmatter(NO_FRONTMATTER)
+    meta, _body = split_frontmatter(NO_FRONTMATTER)
     assert meta == {}
     with pytest.raises(FrontmatterError):
         skill_from_text(NO_FRONTMATTER, skill_id="x")
