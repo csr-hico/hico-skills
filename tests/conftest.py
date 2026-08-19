@@ -80,12 +80,12 @@ def store(skills_dir, agents_dir):
 
 @pytest.fixture
 def settings(skills_dir, agents_dir):
-    # Auth disabled (no OIDC_ISSUER) so tools are callable in-process. frontend_dir defaults
-    # to the repo's frontend/ directory.
+    # Auth disabled (no ENTRA_TENANT_ID, explicit ALLOW_ANONYMOUS opt-in) so tools are callable
+    # in-process. frontend_dir defaults to the repo's frontend/ directory.
     env = {
         "SKILLS_DIR": str(skills_dir),
         "AGENTS_DIR": str(agents_dir),
-        "MCP_REQUIRED_GROUP": "",
+        "ALLOW_ANONYMOUS": "1",
         "PUBLIC_BASE_URL": "https://example.test",
     }
     return load_settings(env)

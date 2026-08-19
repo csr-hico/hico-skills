@@ -1,7 +1,8 @@
-"""Pure header parsing + the gating decision for the WEB UI (forward-auth).
+"""Pure header parsing for the WEB UI identity display.
 
-NOTE: these headers are only trustworthy behind the Authentik outpost. The /mcp endpoint
-does NOT use this - it authorizes on the validated JWT `groups` claim (see server.py).
+NOTE: these headers are only trustworthy behind oauth2-proxy (reverse-proxy mode strips and
+re-injects X-Forwarded-* identity headers, so clients cannot spoof them). The /mcp endpoint
+does NOT use this - it authorizes on the validated Entra JWT (see server.py).
 """
 
 from __future__ import annotations
@@ -10,9 +11,9 @@ from collections.abc import Mapping
 
 from .models import Identity
 
-_USER_HEADER = "x-authentik-username"
-_GROUPS_HEADER = "x-authentik-groups"
-_NAME_HEADER = "x-authentik-name"  # Entra display name ("Vorname Nachname"), for avatar initials
+_USER_HEADER = "x-forwarded-preferred-username"  # Entra UPN, e.g. vorname.nachname@firma.tld
+_EMAIL_HEADER = "x-forwarded-email"
+_GROUPS_HEADER = "x-forwarded-groups"
 
 
 def _get_ci(headers: Mapping[str, str], key: str) -> str | None:
@@ -23,16 +24,9 @@ def _get_ci(headers: Mapping[str, str], key: str) -> str | None:
 
 
 def identity_from_headers(headers: Mapping[str, str]) -> Identity:
-    """Build an Identity from forward-auth headers. Absent headers -> anonymous."""
-    username = _get_ci(headers, _USER_HEADER)
-    name = _get_ci(headers, _NAME_HEADER)
+    """Build an Identity from oauth2-proxy headers. Absent headers -> anonymous."""
+    username = _get_ci(headers, _USER_HEADER) or _get_ci(headers, _EMAIL_HEADER)
     raw_groups = _get_ci(headers, _GROUPS_HEADER)
     groups = tuple(g.strip() for g in raw_groups.split(",") if g.strip()) if raw_groups else ()
-    return Identity(username=(username or None), name=(name or None), groups=groups)
-
-
-def is_allowed(identity: Identity, required_group: str | None) -> bool:
-    """Open when required_group is falsy; otherwise membership is required."""
-    if not required_group:
-        return True
-    return required_group in identity.groups
+    # oauth2-proxy forwards no display-name claim; the UI falls back to username for initials.
+    return Identity(username=(username or None), name=None, groups=groups)

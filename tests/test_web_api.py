@@ -13,6 +13,20 @@ def client(settings):
         yield c
 
 
+def test_build_app_fails_closed_without_auth_optin(skills_dir, agents_dir):
+    # No Entra config AND no explicit ALLOW_ANONYMOUS -> refuse to start rather than
+    # serving /mcp without auth (e.g. after a failed env sync).
+    from hico_skills.config import load_settings
+
+    env = {
+        "SKILLS_DIR": str(skills_dir),
+        "AGENTS_DIR": str(agents_dir),
+        "PUBLIC_BASE_URL": "https://example.test",
+    }
+    with pytest.raises(RuntimeError, match="ALLOW_ANONYMOUS"):
+        build_app(load_settings(env))
+
+
 def test_healthz_open(client):
     r = client.get("/healthz")
     assert r.status_code == 200
@@ -29,16 +43,16 @@ def test_api_skills_shape_includes_description(client):
     assert beta["resources"] == ["scripts/run.py", "templates/out.txt"]
 
 
-def test_api_me_reads_forward_auth_headers(client):
+def test_api_me_reads_oauth2_proxy_headers(client):
     r = client.get(
         "/api/me",
         headers={
-            "X-authentik-username": "jdoe",
-            "X-authentik-name": "Jane Doe",
-            "X-authentik-groups": "HICO,dev",
+            "X-Forwarded-Preferred-Username": "jdoe@hico.test",
+            "X-Forwarded-Email": "jdoe@hico.test",
+            "X-Forwarded-Groups": "HICO,dev",
         },
     )
-    assert r.json() == {"username": "jdoe", "name": "Jane Doe", "groups": ["HICO", "dev"]}
+    assert r.json() == {"username": "jdoe@hico.test", "name": None, "groups": ["HICO", "dev"]}
 
 
 def test_api_me_anonymous(client):

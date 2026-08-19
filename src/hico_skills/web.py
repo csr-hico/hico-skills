@@ -2,7 +2,7 @@
 
 Routes are registered via @mcp.custom_route on the FastMCP instance so they share one process
 with /mcp. custom_route handlers are NOT wrapped by MCP auth - the web surface is gated upstream
-by Authentik forward-auth (Traefik), and /healthz must stay open for the Docker healthcheck.
+by oauth2-proxy (direct Entra ID login), and /healthz must stay open for the Docker healthcheck.
 """
 
 from __future__ import annotations
@@ -35,11 +35,11 @@ def register_routes(mcp: FastMCP, settings: Settings, store: SkillStore) -> None
     logo_png = (settings.frontend_dir / "hico-logo.png").read_bytes()
 
     @mcp.custom_route("/healthz", methods=["GET"])
-    async def healthz(request):  # noqa: ANN001
+    async def healthz(request):
         return PlainTextResponse("ok")
 
     @mcp.custom_route("/api/skills", methods=["GET"])
-    async def api_skills(request):  # noqa: ANN001
+    async def api_skills(request):
         store.maybe_reload()
         return JSONResponse(
             [
@@ -56,31 +56,39 @@ def register_routes(mcp: FastMCP, settings: Settings, store: SkillStore) -> None
         )
 
     @mcp.custom_route("/api/me", methods=["GET"])
-    async def api_me(request):  # noqa: ANN001
+    async def api_me(request):
         ident = identity_from_headers(request.headers)
         return JSONResponse(
             {"username": ident.username, "name": ident.name, "groups": list(ident.groups)}
         )
 
     @mcp.custom_route("/", methods=["GET"])
-    async def index(request):  # noqa: ANN001
+    async def index(request):
         return HTMLResponse(render_index(index_html, settings))
 
     @mcp.custom_route("/static/styles.css", methods=["GET"])
-    async def styles(request):  # noqa: ANN001
+    async def styles(request):
         return Response(styles_css, media_type="text/css")
 
     @mcp.custom_route("/static/app.js", methods=["GET"])
-    async def appjs(request):  # noqa: ANN001
+    async def appjs(request):
         return Response(app_js, media_type="application/javascript")
 
     @mcp.custom_route("/static/hico-logo.png", methods=["GET"])
-    async def logo(request):  # noqa: ANN001
+    async def logo(request):
         return Response(logo_png, media_type="image/png")
 
 
 def build_mcp(settings: Settings, store: SkillStore) -> FastMCP:
-    mcp = FastMCP("HICO Skill Library", auth=build_auth(settings))
+    auth = build_auth(settings)
+    if auth is None and not settings.allow_anonymous:
+        # Fail closed: a lost/failed env sync must not silently serve /mcp without auth.
+        # Local dev opts in explicitly via ALLOW_ANONYMOUS=1.
+        raise RuntimeError(
+            "Auth is not configured (ENTRA_TENANT_ID / OIDC_CLIENT_ID missing). "
+            "Set ALLOW_ANONYMOUS=1 to run without auth (local dev only)."
+        )
+    mcp = FastMCP("HICO Skill Library", auth=auth)
     register_tools(mcp, settings, store)
     register_resources(mcp, settings, store)
     register_guidance(mcp, settings)
