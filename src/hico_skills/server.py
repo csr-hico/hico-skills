@@ -29,6 +29,19 @@ from .store import SkillStore
 
 logger = logging.getLogger("hico_skills.search")
 
+# Callback patterns of the known MCP clients. The proxy's DCR endpoint (/register) is
+# necessarily public, so without this allowlist ANY attacker-registered redirect target
+# would receive authorization codes (confused-deputy / code exfiltration) - especially
+# with the consent screen disabled below. Extend when onboarding a new client type.
+_ALLOWED_CLIENT_REDIRECT_URIS = [
+    "https://claude.ai/*",  # claude.ai connector
+    "https://claude.com/*",  # claude.ai connector (claude.com domain)
+    "https://chatgpt.com/*",  # ChatGPT connectors
+    "https://chat.openai.com/*",  # ChatGPT (legacy domain)
+    "http://localhost:*",  # CLI clients (Claude Code, Gemini CLI): RFC 8252 loopback flow
+    "http://127.0.0.1:*",
+]
+
 
 def build_auth(settings: Settings) -> AzureProvider | None:
     """DCR/CIMD-capable OAuth proxy directly against Entra ID, or None when auth is disabled.
@@ -41,6 +54,12 @@ def build_auth(settings: Settings) -> AzureProvider | None:
     """
     if not settings.auth_enabled:
         return None
+    if not settings.oidc_client_secret:
+        # Fail loud, never half-configured: an empty secret would derive the token-signing
+        # key from empty material instead of disabling auth or refusing to start.
+        raise RuntimeError(
+            "ENTRA_TENANT_ID and OIDC_CLIENT_ID are set but OIDC_CLIENT_SECRET is empty"
+        )
     return AzureProvider(
         client_id=settings.oidc_client_id,
         client_secret=settings.oidc_client_secret,
@@ -48,9 +67,11 @@ def build_auth(settings: Settings) -> AzureProvider | None:
         required_scopes=[settings.mcp_scope],
         base_url=settings.public_base_url,
         redirect_path="/auth/callback",
+        allowed_client_redirect_uris=_ALLOWED_CLIENT_REDIRECT_URIS,
         # Internal tool: the IdP already authenticates and tenant membership gates access, so the
         # per-client consent screen only adds a fragile single-use-transaction step (re-hitting
-        # /consent after submit -> "invalid or expired transaction"). Auto-approve instead.
+        # /consent after submit -> "invalid or expired transaction"). Auto-approve instead;
+        # the redirect-URI allowlist above is the confused-deputy guard.
         require_authorization_consent=False,
     )
 

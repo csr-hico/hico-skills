@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import pytest
 from fastmcp.server.auth.providers.azure import AzureProvider
 
 from hico_skills.config import load_settings
@@ -28,9 +29,24 @@ def test_build_auth_returns_azure_provider_when_configured():
     # The custom API scope defaults to mcp.access and gets the api://<client_id> prefix.
     assert auth.identifier_uri == "api://cid"
     assert s.mcp_scope == "mcp.access"
+    # DCR is public, so client redirect URIs MUST be allowlisted (confused-deputy guard).
+    assert auth._allowed_client_redirect_uris, "client redirect URIs must not be allow-all"
 
 
 def test_build_auth_none_without_entra():
     assert build_auth(load_settings({})) is None
     # client_id alone is not enough - tenant is required too.
     assert build_auth(load_settings({"OIDC_CLIENT_ID": "cid"})) is None
+
+
+def test_build_auth_raises_on_missing_secret():
+    # Half-configured must fail loud, not run with a key derived from empty material.
+    s = load_settings(
+        {
+            "ENTRA_TENANT_ID": "11111111-2222-3333-4444-555555555555",
+            "OIDC_CLIENT_ID": "cid",
+            "PUBLIC_BASE_URL": "https://hico-skills.example.tld",
+        }
+    )
+    with pytest.raises(RuntimeError, match="OIDC_CLIENT_SECRET"):
+        build_auth(s)
