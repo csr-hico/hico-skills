@@ -21,7 +21,7 @@ values are rendered on the OnePager only, behind login.
 python -m venv .venv && source .venv/bin/activate
 pip install -e ".[dev]"
 pytest -q                       # all green is the merge gate
-python -m hico_skills           # auth off for local (no ENTRA_TENANT_ID); serves on :8000
+ALLOW_ANONYMOUS=1 python -m hico_skills   # auth off for local dev (explicit opt-in); serves on :8000
 ```
 
 Then open <http://127.0.0.1:8000/> and hit `http://127.0.0.1:8000/mcp` with an MCP client.
@@ -76,7 +76,8 @@ the full provisioning sequence.
 
 | Var | Purpose |
 |-----|---------|
-| `ENTRA_TENANT_ID` / `OIDC_CLIENT_ID` / `OIDC_CLIENT_SECRET` | Entra app registration used for `/mcp` token validation AND the web login (empty tenant = auth disabled, for local dev) |
+| `ENTRA_TENANT_ID` / `OIDC_CLIENT_ID` / `OIDC_CLIENT_SECRET` | Entra app registration used for `/mcp` token validation AND the web login |
+| `ALLOW_ANONYMOUS` | `1` = run without auth (local dev only); otherwise missing Entra config refuses to start (fail closed) |
 | `MCP_SCOPE` | custom API scope name under "Expose an API" (default `mcp.access`) |
 | `OAUTH2_PROXY_COOKIE_SECRET` | 32-byte base64 session-cookie key for the oauth2-proxy sidecar |
 | `PUBLIC_BASE_URL` | used to render the `/mcp` URL in the connect docs |

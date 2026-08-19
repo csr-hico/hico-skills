@@ -29,6 +29,7 @@ class Settings:
     oidc_client_id: str
     oidc_client_secret: str
     mcp_scope: str  # custom API scope name under "Expose an API" (unprefixed)
+    allow_anonymous: bool  # explicit opt-in for running WITHOUT auth (local dev only)
     public_base_url: str
     # Generic, non-revealing:
     brand_orange: str
@@ -74,6 +75,7 @@ def load_settings(env: dict[str, str] | None = None) -> Settings:
         oidc_client_id=e.get("OIDC_CLIENT_ID", "").strip(),
         oidc_client_secret=e.get("OIDC_CLIENT_SECRET", "").strip(),
         mcp_scope=e.get("MCP_SCOPE", "").strip() or "mcp.access",
+        allow_anonymous=e.get("ALLOW_ANONYMOUS", "").strip() == "1",
         public_base_url=e.get("PUBLIC_BASE_URL", "").strip(),
         brand_orange=e.get("BRAND_ORANGE", "#FF5F2C").strip(),
         brand_blue=e.get("BRAND_BLUE", "#2C53AB").strip(),

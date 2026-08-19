@@ -80,7 +80,15 @@ def register_routes(mcp: FastMCP, settings: Settings, store: SkillStore) -> None
 
 
 def build_mcp(settings: Settings, store: SkillStore) -> FastMCP:
-    mcp = FastMCP("HICO Skill Library", auth=build_auth(settings))
+    auth = build_auth(settings)
+    if auth is None and not settings.allow_anonymous:
+        # Fail closed: a lost/failed env sync must not silently serve /mcp without auth.
+        # Local dev opts in explicitly via ALLOW_ANONYMOUS=1.
+        raise RuntimeError(
+            "Auth is not configured (ENTRA_TENANT_ID / OIDC_CLIENT_ID missing). "
+            "Set ALLOW_ANONYMOUS=1 to run without auth (local dev only)."
+        )
+    mcp = FastMCP("HICO Skill Library", auth=auth)
     register_tools(mcp, settings, store)
     register_resources(mcp, settings, store)
     register_guidance(mcp, settings)
